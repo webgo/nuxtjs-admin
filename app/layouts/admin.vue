@@ -3,8 +3,8 @@
     <!-- 侧边栏 -->
     <el-aside :width="isCollapse ? '64px' : '220px'" class="layout-aside">
       <div class="logo" :class="{ collapsed: isCollapse }">
-        <span v-if="!isCollapse">Admin App</span>
-        <span v-else>AA</span>
+        <span v-if="!isCollapse">NuxtJS Admin</span>
+        <span v-else>NA</span>
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -52,7 +52,7 @@
           <NotificationBell />
           <el-dropdown trigger="click" @command="handleCommand">
             <span class="user-info">
-              <el-avatar :size="32" icon="UserFilled" />
+              <el-avatar :size="32" :src="authStore.user?.avatar || undefined" icon="UserFilled" />
               <span class="username">{{ authStore.user?.nickname || authStore.user?.username }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>

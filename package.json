@@ -1,5 +1,5 @@
 {
-  "name": "admin-app",
+  "name": "nuxtjs-admin",
   "type": "module",
   "private": true,
   "scripts": {

@@ -18,6 +18,9 @@ logs
 .fleet
 .idea
 
+# Uploaded images
+public/uploads/
+
 # Local env files
 .env
 .env.*

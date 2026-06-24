@@ -11,11 +11,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    jwtSecret: process.env.JWT_SECRET || 'admin-app-secret-key-2024',
+    jwtSecret: process.env.JWT_SECRET || 'nuxtjs-admin-secret-key-2024',
     jwtExpiresIn: '24h',
   },
 
-  css: ['element-plus/dist/index.css'],
+  css: ['element-plus/dist/index.css', '~/assets/css/global.css'],
 
   typescript: {
     strict: true,
@@ -25,7 +25,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'Admin App',
+      title: 'NuxtJS Admin',
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
     },
