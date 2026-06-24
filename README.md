@@ -24,22 +24,28 @@
 ## 快速开始
 
 ```bash
-# 1. 安装依赖
+# 1. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填入你的数据库连接信息和 JWT 密钥
+# DATABASE_URL="mysql://root:your_password@localhost:3306/admin_app"
+# JWT_SECRET="your-secret-key-here"
+
+# 2. 安装依赖
 npm install
 
-# 2. 配置数据库
-# 编辑 prisma/schema.prisma 中的 datasource url
-# 确保 MySQL 已运行，创建数据库:
-# CREATE DATABASE admin_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+# 3. 确保 MySQL 已运行，创建数据库 (utf8mb4 编码)
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS admin_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 3. 运行数据库迁移
+# 4. 运行数据库迁移（自动生成 Prisma Client）
 npx prisma migrate dev
 
-# 4. 初始化种子数据
+# 5. 初始化种子数据（创建默认管理员账号和菜单）
 npm run seed
 
-# 5. 启动开发服务器 (http://localhost:3000)
+# 6. 启动开发服务器
 npm run dev
+# 浏览器打开 http://localhost:3000
+# 默认管理员: admin / admin123
 ```
 
 ## 默认账号
