@@ -1,4 +1,4 @@
-# Admin App
+# Nuxtjs-Admin
 
 基于 Nuxt 4 的通用后台管理脚手架（RuoYi 风格），用于快速搭建业务模块。
 
