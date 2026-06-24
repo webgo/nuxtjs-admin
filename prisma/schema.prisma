@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ========== 系统用户 ==========
+model SysUser {
+  id         Int       @id @default(autoincrement())
+  username   String    @unique @db.VarChar(50)
+  password   String    @db.VarChar(100)
+  nickname   String?   @db.VarChar(50)
+  email      String?   @db.VarChar(100)
+  phone      String?   @db.VarChar(20)
+  avatar     String?   @db.VarChar(255)
+  status     Int       @default(1) // 0=禁用, 1=启用
+  remark     String?   @db.VarChar(500)
+  createTime DateTime  @default(now()) @map("create_time")
+  updateTime DateTime  @updatedAt @map("update_time")
+
+  roles SysUserRole[]
+  menus SysUserMenu[]
+
+  @@map("sys_user")
+}
+
+// ========== 系统角色 ==========
+model SysRole {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  code        String    @unique @db.VarChar(50)
+  description String?   @db.VarChar(255)
+  status      Int       @default(1) // 0=禁用, 1=启用
+  sort        Int       @default(0)
+  remark      String?   @db.VarChar(500)
+  createTime  DateTime  @default(now()) @map("create_time")
+  updateTime  DateTime  @updatedAt @map("update_time")
+
+  users       SysUserRole[]
+  permissions SysRolePermission[]
+
+  @@map("sys_role")
+}
+
+// ========== 用户角色关联 ==========
+model SysUserRole {
+  userId Int    @map("user_id")
+  roleId Int    @map("role_id")
+
+  user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role SysRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("sys_user_role")
+}
+
+// ========== 权限/菜单 ==========
+model SysPermission {
+  id         Int             @id @default(autoincrement())
+  name       String          @db.VarChar(50)
+  code       String?         @db.VarChar(100) // 权限标识
+  type       Int             @default(1) // 0=目录, 1=菜单, 2=按钮
+  parentId   Int?            @default(0) @map("parent_id")
+  path       String?         @db.VarChar(255)
+  component  String?         @db.VarChar(255)
+  icon       String?         @db.VarChar(50)
+  sort       Int             @default(0)
+  status     Int             @default(1) // 0=禁用, 1=启用
+  visible    Int             @default(1) // 0=隐藏, 1=显示
+  remark     String?         @db.VarChar(500)
+  createTime DateTime        @default(now()) @map("create_time")
+  updateTime DateTime        @updatedAt @map("update_time")
+
+  roles SysRolePermission[]
+  users SysUserMenu[]
+
+  @@map("sys_permission")
+}
+
+// ========== 角色权限关联 ==========
+model SysRolePermission {
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+
+  role       SysRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission SysPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("sys_role_permission")
+}
+
+// ========== 用户菜单（单独为用户分配的菜单） ==========
+model SysUserMenu {
+  userId       Int @map("user_id")
+  permissionId Int @map("permission_id")
+
+  user       SysUser       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission SysPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, permissionId])
+  @@map("sys_user_menu")
+}
+
+// ========== 字典类型 ==========
+model SysDictType {
+  id         Int           @id @default(autoincrement())
+  name       String        @db.VarChar(50)
+  code       String        @unique @db.VarChar(50)
+  status     Int           @default(1) // 0=禁用, 1=启用
+  remark     String?       @db.VarChar(500)
+  createTime DateTime      @default(now()) @map("create_time")
+  updateTime DateTime      @updatedAt @map("update_time")
+
+  data SysDictData[]
+
+  @@map("sys_dict_type")
+}
+
+// ========== 字典数据 ==========
+model SysDictData {
+  id         Int      @id @default(autoincrement())
+  dictTypeId Int      @map("dict_type_id")
+  label      String   @db.VarChar(100)
+  value      String   @db.VarChar(100)
+  sort       Int      @default(0)
+  status     Int      @default(1) // 0=禁用, 1=启用
+  remark     String?  @db.VarChar(500)
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+
+  dictType SysDictType @relation(fields: [dictTypeId], references: [id], onDelete: Cascade)
+
+  @@map("sys_dict_data")
+}
+
+// ========== 文件管理 ==========
+model SysFile {
+  id          Int       @id @default(autoincrement())
+  fileName    String    @map("file_name") @db.VarChar(255)
+  storageName String    @unique @map("storage_name") @db.VarChar(255)
+  filePath    String    @map("file_path") @db.VarChar(500)
+  fileSize    Int       @map("file_size")
+  fileType    String?   @map("file_type") @db.VarChar(100)
+  extension   String?   @db.VarChar(20)
+  module      String?   @db.VarChar(50)
+  uploadBy    Int?      @map("upload_by")
+  status      Int       @default(1) // 0=已删除, 1=正常
+  storageType String    @default("local") @map("storage_type") @db.VarChar(20) // local, oss, etc.
+  remark      String?   @db.VarChar(500)
+  createTime  DateTime  @default(now()) @map("create_time")
+  updateTime  DateTime  @updatedAt @map("update_time")
+
+  @@map("sys_file")
+}
+
+// ========== 内容分类 ==========
+model SysCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  code        String    @unique @db.VarChar(50)
+  description String?   @db.VarChar(255)
+  sort        Int       @default(0)
+  status      Int       @default(1) // 0=禁用, 1=启用
+  remark      String?   @db.VarChar(500)
+  createTime  DateTime  @default(now()) @map("create_time")
+  updateTime  DateTime  @updatedAt @map("update_time")
+
+  contents SysContent[]
+
+  @@map("sys_category")
+}
+
+// ========== 内容管理 ==========
+model SysContent {
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(200)
+  thumbnail      String?   @db.VarChar(500)
+  summary        String?   @db.Text
+  content        String?   @db.Text
+  categoryId     Int?      @map("category_id")
+  isRecommended  Int       @default(0) @map("is_recommended") // 0=否, 1=是
+  status         Int       @default(1) // 0=禁用, 1=启用
+  clickCount     Int       @default(0) @map("click_count")
+  remark         String?   @db.VarChar(500)
+  createTime     DateTime  @default(now()) @map("create_time")
+  updateTime     DateTime  @updatedAt @map("update_time")
+
+  category SysCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("sys_content")
+}
+
+// ========== 审计日志 ==========
+model SysAuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  username   String   @db.VarChar(50)
+  action     String   @db.VarChar(50)  // CREATE | UPDATE | DELETE | LOGIN | LOGOUT
+  target     String   @db.VarChar(50)  // user | role | permission | dict-type | dict-data | category | content | notification
+  targetId   Int?     @map("target_id")
+  detail     String?  @db.Text         // JSON 变更详情
+  ip         String?  @db.VarChar(50)
+  createTime DateTime @default(now()) @map("create_time")
+
+  @@map("sys_audit_log")
+}
+
+// ========== 通知中心 ==========
+model SysNotification {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")     // 0=全员通知
+  title      String   @db.VarChar(200)
+  content    String?  @db.Text
+  type       String   @default("system") @db.VarChar(30) // system | approval | reminder
+  isRead     Int      @default(0) @map("is_read")  // 0=未读, 1=已读
+  createTime DateTime @default(now()) @map("create_time")
+
+  @@map("sys_notification")
+}
