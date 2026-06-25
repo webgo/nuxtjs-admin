@@ -1,7 +1,7 @@
 export default defineNitroPlugin((nitroApp) => {
   // 这里可以写一些服务启动时的逻辑
   console.log("=== Nitro服务已启动 ===");
-  scheduleTask(); // 启动定时任务
+  // scheduleTask(); // 启动定时任务
 
   // 服务停止时的Hook
   nitroApp.hooks.hook("close", async () => {

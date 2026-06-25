@@ -268,9 +268,6 @@ onMounted(() => {
 .search-card {
   margin-bottom: 16px;
 }
-.table-card {
-  min-height: 400px;
-}
 .table-toolbar {
   margin-bottom: 16px;
 }

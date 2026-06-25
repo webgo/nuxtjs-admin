@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-card">
       <div class="login-header">
-        <h2>Admin App</h2>
+        <h2>NuxtJS Admin</h2>
         <p>后台管理系统</p>
       </div>
       <el-form
