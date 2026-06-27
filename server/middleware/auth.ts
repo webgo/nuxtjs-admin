@@ -24,6 +24,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'token 无效或已过期' })
   }
 
+  // 校验存储中是否仍存在该 token 的在线记录
+  // 防止管理员强制下线用户后，JWT 仍有效的问题
+  // 存储不可用时降级为仅依赖 JWT 校验
+  try {
+    const { hasItem } = await import('../utils/storage')
+    const exists = await hasItem(`online_token:${token}`)
+    if (!exists) {
+      throw createError({ statusCode: 401, message: '登录已过期，请重新登录' })
+    }
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'statusCode' in err) throw err
+    console.warn('[Auth] Storage check failed, fallback to JWT only:', (err as Error).message)
+  }
+
   // 将用户信息注入到 event.context
   event.context.auth = payload
 })

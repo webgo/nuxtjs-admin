@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <!-- 统计卡片 -->
     <el-row :gutter="20">
       <el-col :span="6" v-for="stat in stats" :key="stat.label">
         <el-card shadow="hover" class="stat-card">
@@ -9,10 +10,7 @@
       </el-col>
     </el-row>
 
-    <el-card class="welcome-card" style="margin-top: 20px">
-      <h2>欢迎回来，{{ authStore.user?.nickname || authStore.user?.username }}！</h2>
-      <p>当前角色：{{ authStore.roles.join(', ') || '无' }}</p>
-    </el-card>
+
   </div>
 </template>
 
@@ -29,8 +27,6 @@ interface StatItem {
   value: string | number
 }
 
-const authStore = useAuthStore()
-
 const stats = ref<StatItem[]>([
   { label: '用户数', value: '-' },
   { label: '角色数', value: '-' },
@@ -38,7 +34,6 @@ const stats = ref<StatItem[]>([
   { label: '字典数', value: '-' },
 ])
 
-// 加载统计数据
 onMounted(async () => {
   try {
     const [userRes, roleRes, permRes, dictRes] = await Promise.all([
@@ -54,7 +49,7 @@ onMounted(async () => {
       { label: '字典数', value: dictRes.data.total },
     ]
   } catch (err) {
-    console.warn('Dashboard stats load failed:', err)
+    console.warn('Dashboard load failed:', err)
   }
 })
 </script>
@@ -79,9 +74,5 @@ onMounted(async () => {
   font-size: 14px;
   color: #666;
   margin-top: 8px;
-}
-
-.welcome-card h2 {
-  margin: 0 0 10px;
 }
 </style>

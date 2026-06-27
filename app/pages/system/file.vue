@@ -1,12 +1,12 @@
 <template>
   <div class="file-page">
     <el-card class="search-card">
-      <el-form :model="query" inline size="default">
+      <el-form :model="filters" inline size="default">
         <el-form-item label="文件名">
-          <el-input v-model="query.fileName" placeholder="请输入" clearable />
+          <el-input v-model="filters.fileName" placeholder="请输入" clearable />
         </el-form-item>
         <el-form-item label="文件类型">
-          <el-select v-model="query.fileType" placeholder="请选择" clearable style="width:140px">
+          <el-select v-model="filters.fileType" placeholder="请选择" clearable style="width:140px">
             <el-option label="图片" value="image" />
             <el-option label="文档" value="pdf" />
             <el-option label="压缩包" value="zip" />
@@ -24,7 +24,7 @@
       <div class="table-toolbar">
         <el-button type="primary" @click="uploadVisible = true">上传文件</el-button>
       </div>
-      <el-table :data="fileList" border stripe v-loading="loading">
+      <el-table :data="fileList" border stripe v-loading="status === 'pending'">
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column label="预览" width="90" align="center">
           <template #default="{ row }">
@@ -72,11 +72,10 @@
       </el-table>
       <div class="table-pagination">
         <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.pageSize"
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="fetchData"
         />
       </div>
     </el-card>
@@ -124,21 +123,24 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const { formatFileSize } = useFileUpload()
 
-const fileList = ref<any[]>([])
-const total = ref(0)
-const loading = ref(false)
 const uploadVisible = ref(false)
 const uploadLoading = ref(false)
 const uploadRef = ref()
 const pendingFiles = ref<any[]>([])
 const previewUrls = ref<string[]>([])
 
-const query = reactive({
-  page: 1,
-  pageSize: 10,
+const page = ref(1)
+const pageSize = ref(10)
+const filters = reactive({
   fileName: '',
   fileType: '',
 })
+
+const { data, status, refresh } = useLazyFetch('/api/system/file', {
+  query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
+})
+const fileList = computed(() => (data.value as any)?.data?.list ?? [])
+const total = computed(() => (data.value as any)?.data?.total ?? 0)
 
 function isImageFile(row: any) {
   return row.fileType && row.fileType.startsWith('image/')
@@ -156,19 +158,8 @@ function onFileRemove(_file: any, fileList_: any[]) {
   previewUrls.value = []
 }
 
-async function fetchData() {
-  loading.value = true
-  try {
-    const res: any = await $fetch('/api/system/file', { params: query })
-    fileList.value = res.data.list
-    total.value = res.data.total
-  } finally {
-    loading.value = false
-  }
-}
-
-function handleSearch() { query.page = 1; fetchData() }
-function handleReset() { query.fileName = ''; query.fileType = ''; query.page = 1; fetchData() }
+function handleSearch() { page.value = 1 }
+function handleReset() { filters.fileName = ''; filters.fileType = ''; page.value = 1 }
 
 async function handleUpload() {
   if (pendingFiles.value.length === 0) {
@@ -186,7 +177,7 @@ async function handleUpload() {
     uploadVisible.value = false
     pendingFiles.value = []
     previewUrls.value = []
-    fetchData()
+    refresh()
   } catch (err: any) {
     ElMessage.error(err.data?.message || '上传失败')
   } finally {
@@ -202,7 +193,7 @@ async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除文件"${row.fileName}"？`, '提示', { type: 'warning' })
   await $fetch(`/api/system/file/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
-  fetchData()
+  refresh()
 }
 
 function formatDate(d: string) {
@@ -219,7 +210,7 @@ async function copyPath(path: string) {
   }
 }
 
-onMounted(() => fetchData())
+// useLazyFetch auto-fetches on mount
 </script>
 
 <style scoped>

@@ -163,6 +163,37 @@ export interface SystemMonitorData {
   database: { status: string; version: string } | null
 }
 
+// ========== 在线用户模块 ==========
+export interface OnlineUserItem {
+  userId: number
+  username: string
+  nickname: string | null
+  ip: string
+  loginTime: string
+  token: string
+}
+
+// ========== 缓存监控 ==========
+export interface CacheInfoData {
+  version: string
+  uptimeInSeconds: number
+  usedMemory: string
+  usedMemoryHuman: string
+  totalKeys: number
+  connectedClients: number
+  hitRate: string
+  os: string
+  arch: string
+  tcpPort: number
+}
+
+export interface CacheKeyItem {
+  key: string
+  type: string
+  ttl: number
+  size: string
+}
+
 // ========== 文件模块 ==========
 export interface FileRecord {
   id: number

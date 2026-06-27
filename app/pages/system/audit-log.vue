@@ -2,12 +2,12 @@
   <div class="audit-log-page">
     <!-- 搜索栏 -->
     <el-card class="search-card">
-      <el-form :model="query" inline size="default">
+      <el-form :model="filters" inline size="default">
         <el-form-item label="操作人">
-          <el-input v-model="query.username" placeholder="用户名" clearable style="width:140px" />
+          <el-input v-model="filters.username" placeholder="用户名" clearable style="width:140px" />
         </el-form-item>
         <el-form-item label="操作类型">
-          <el-select v-model="query.action" placeholder="全部" clearable style="width:120px">
+          <el-select v-model="filters.action" placeholder="全部" clearable style="width:120px">
             <el-option label="创建" value="CREATE" />
             <el-option label="修改" value="UPDATE" />
             <el-option label="删除" value="DELETE" />
@@ -15,7 +15,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="目标模块">
-          <el-select v-model="query.target" placeholder="全部" clearable style="width:120px">
+          <el-select v-model="filters.target" placeholder="全部" clearable style="width:120px">
             <el-option label="用户" value="user" />
             <el-option label="角色" value="role" />
             <el-option label="权限" value="permission" />
@@ -31,7 +31,7 @@
     </el-card>
 
     <el-card class="table-card">
-      <el-table :data="list" border stripe v-loading="loading" max-height="600">
+      <el-table :data="list" border stripe v-loading="status === 'pending'" max-height="600">
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="username" label="操作人" width="120" />
         <el-table-column label="操作类型" width="100">
@@ -61,11 +61,10 @@
       </el-table>
       <div class="table-pagination">
         <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.pageSize"
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="fetchData"
         />
       </div>
     </el-card>
@@ -86,43 +85,33 @@ import { View } from '@element-plus/icons-vue'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const list = ref<AuditLogItem[]>([])
-const total = ref(0)
-const loading = ref(false)
 const detailDialogVisible = ref(false)
 const detailJson = ref('')
 const detailTitle = ref('')
 
-const query = reactive({
-  page: 1,
-  pageSize: 20,
+const page = ref(1)
+const pageSize = ref(20)
+const filters = reactive({
   username: '',
   action: undefined as string | undefined,
   target: undefined as string | undefined,
 })
 
-async function fetchData() {
-  loading.value = true
-  try {
-    const res: any = await $fetch('/api/system/audit-log', { params: query })
-    list.value = res.data.list
-    total.value = res.data.total
-  } finally {
-    loading.value = false
-  }
-}
+const { data, status, refresh } = useLazyFetch('/api/system/audit-log', {
+  query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
+})
+const list = computed(() => (data.value as any)?.data?.list ?? [])
+const total = computed(() => (data.value as any)?.data?.total ?? 0)
 
 function handleSearch() {
-  query.page = 1
-  fetchData()
+  page.value = 1
 }
 
 function handleReset() {
-  query.username = ''
-  query.action = undefined
-  query.target = undefined
-  query.page = 1
-  fetchData()
+  filters.username = ''
+  filters.action = undefined
+  filters.target = undefined
+  page.value = 1
 }
 
 function formatTime(t: string) {
@@ -154,7 +143,7 @@ async function copyDetail() {
   }
 }
 
-onMounted(() => fetchData())
+// useLazyFetch auto-fetches on mount
 </script>
 
 <style scoped>

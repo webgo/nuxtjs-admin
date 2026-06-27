@@ -2,12 +2,12 @@
   <div class="user-page">
     <!-- 搜索栏 -->
     <el-card class="search-card">
-      <el-form :model="query" inline size="default">
+      <el-form :model="filters" inline size="default">
         <el-form-item label="用户名">
-          <el-input v-model="query.username" placeholder="请输入用户名" clearable />
+          <el-input v-model="filters.username" placeholder="请输入用户名" clearable />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="query.status" placeholder="请选择" clearable style="width:120px">
+          <el-select v-model="filters.status" placeholder="请选择" clearable style="width:120px">
             <el-option label="启用" :value="1" />
             <el-option label="禁用" :value="0" />
           </el-select>
@@ -24,7 +24,7 @@
       <div class="table-toolbar">
         <el-button type="primary" @click="handleAdd">新增用户</el-button>
       </div>
-      <el-table :data="userList" border stripe v-loading="loading">
+      <el-table :data="userList" border stripe v-loading="status === 'pending'">
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="username" label="用户名" min-width="120" />
         <el-table-column prop="nickname" label="昵称" min-width="120" />
@@ -57,11 +57,10 @@
       </el-table>
       <div class="table-pagination">
         <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.pageSize"
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="fetchData"
         />
       </div>
     </el-card>
@@ -116,21 +115,24 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 import type { UserItem, UserQuery, UserCreateBody, ApiResponse, PaginatedData } from '#shared/types/api'
 
-const userList = ref<UserItem[]>([])
-const total = ref(0)
-const loading = ref(false)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const submitLoading = ref(false)
 const formRef = ref()
 const roleOptions = ref<any[]>([])
 
-const query = reactive({
-  page: 1,
-  pageSize: 10,
+const page = ref(1)
+const pageSize = ref(10)
+const filters = reactive({
   username: '',
   status: undefined as number | undefined,
 })
+
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<UserItem>>>('/api/system/user', {
+  query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
+})
+const userList = computed(() => data.value?.data?.list ?? [])
+const total = computed(() => data.value?.data?.total ?? 0)
 
 const form = reactive({
   id: 0,
@@ -159,32 +161,19 @@ watch(isEdit, (v) => {
   }
 })
 
-async function fetchData() {
-  loading.value = true
-  try {
-    const res = await $fetch<ApiResponse<PaginatedData<UserItem>>>('/api/system/user', { params: query })
-    userList.value = res.data.list
-    total.value = res.data.total
-  } finally {
-    loading.value = false
-  }
-}
-
 async function loadRoles() {
   const res: any = await $fetch('/api/system/role/all')
   roleOptions.value = res.data
 }
 
 function handleSearch() {
-  query.page = 1
-  fetchData()
+  page.value = 1
 }
 
 function handleReset() {
-  query.username = ''
-  query.status = undefined
-  query.page = 1
-  fetchData()
+  filters.username = ''
+  filters.status = undefined
+  page.value = 1
 }
 
 function handleAdd() {
@@ -235,7 +224,7 @@ async function handleSubmit() {
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
-    fetchData()
+    refresh()
   } catch (err: any) {
     ElMessage.error(err.data?.message || '操作失败')
   } finally {
@@ -247,7 +236,7 @@ async function handleDelete(row: UserItem) {
   await ElMessageBox.confirm(`确定删除用户"${row.username}"？`, '提示', { type: 'warning' })
   await $fetch(`/api/system/user/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
-  fetchData()
+  refresh()
 }
 
 function formatDate(d: string) {
@@ -256,7 +245,6 @@ function formatDate(d: string) {
 }
 
 onMounted(() => {
-  fetchData()
   loadRoles()
 })
 </script>

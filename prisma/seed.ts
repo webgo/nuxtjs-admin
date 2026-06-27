@@ -85,6 +85,17 @@ async function main() {
     { id: 120, name: '通知中心', code: 'system:notification', type: 1, parentId: 1, path: '/system/notification', icon: 'BellFilled', sort: 7, status: 1, visible: 1 },
     { id: 121, name: '通知查询', code: 'system:notification:list', type: 2, parentId: 120, sort: 1 },
     { id: 122, name: '通知已读', code: 'system:notification:read', type: 2, parentId: 120, sort: 2 },
+
+    // 在线用户
+    { id: 130, name: '在线用户', code: 'system:online-user', type: 1, parentId: 1, path: '/system/online-user', icon: 'Avatar', sort: 8, status: 1, visible: 1 },
+    { id: 131, name: '在线用户查询', code: 'system:online-user:list', type: 2, parentId: 130, sort: 1 },
+    { id: 132, name: '在线用户强退', code: 'system:online-user:force-logout', type: 2, parentId: 130, sort: 2 },
+
+    // 缓存监控 (系统监控下)
+    { id: 140, name: '缓存监控', code: 'monitor:cache', type: 1, parentId: 2, path: '/monitor/cache', icon: 'Coin', sort: 2, status: 1, visible: 1 },
+    { id: 141, name: '缓存查询', code: 'monitor:cache:list', type: 2, parentId: 140, sort: 1 },
+    { id: 142, name: '缓存删除', code: 'monitor:cache:delete', type: 2, parentId: 140, sort: 2 },
+    { id: 143, name: '缓存清空', code: 'monitor:cache:clear', type: 2, parentId: 140, sort: 3 },
   ]
 
   for (const p of permissions) {

@@ -2,6 +2,8 @@
 
 Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手架，用于快速搭建业务模块。
 
+> **文档维护规则**: 每次新增/修改功能后，同步更新 `.env.example`、本文件和 `shared/types/api.ts`。
+
 ## Tech Stack
 
 | 层 | 技术 |
@@ -10,6 +12,7 @@ Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手�
 | UI | Element Plus |
 | ORM | Prisma 7 + MariaDB Adapter |
 | 数据库 | MySQL 8.0 |
+| 缓存 | Redis (ioredis) |
 | 认证 | JWT (jsonwebtoken + bcryptjs) |
 | 测试 | Vitest + @nuxt/test-utils |
 | 导出 | ExcelJS |
@@ -23,10 +26,11 @@ prisma/                   schema.prisma (10 表) + seed.ts + migrations
 server/
   middleware/auth.ts      全局 JWT 认证中间件
   plugins/audit.ts        Nitro 插件，自动记录写操作审计日志
-  utils/                  prisma.ts, jwt.ts, audit.ts, fileStorage.ts
+  utils/                  prisma.ts, jwt.ts, redis.ts, audit.ts, fileStorage.ts
   api/auth/               登录/登出/用户信息/菜单
   api/system/             user/role/permission/dict-type/dict-data/...
                           category/content/file/monitor/audit-log/notification
+                          online-user/cache
 app/
   layouts/admin.vue       侧边栏+顶栏布局（含通知铃铛）
   components/             RichTextEditor, NotificationBell
@@ -81,15 +85,35 @@ await exportExcel({
 - **组件**: `NotificationBell.vue` — 顶栏铃铛图标 + 未读红点 + 下拉预览
 - **页面**: `/system/notification` — 全部通知管理
 - 支持三种类型: `system` (系统) / `approval` (审批) / `reminder` (提醒)
+- 首页 dashboard 展示最新 5 条通知时间轴
 
-### 6. 测试框架
+### 6. Redis 缓存与工具类
+
+- **客户端**: `server/utils/redis.ts` — 单例 `ioredis` 客户端，自动重连
+- **通用方法**: `getRedis()`, `redisGet`, `redisSet`, `redisDel`, `redisScan`, `redisTtl`, `redisInfo`, `redisDbSize`, `redisFlushDb` 等
+- **数据结构操作**: `redisStrlen`, `redisLlen`, `redisScard`, `redisHlen`, `redisZcard`, `redisHgetall`, `redisLrange`, `redisSmembers`, `redisZrange`
+- **配置**: 通过 `.env` 中 `REDIS_URL` 配置连接地址，`REDIS_DB` 指定数据库编号（默认 0）
+
+### 7. 在线用户管理
+
+- **原理**: 登录时将用户会话写入 Redis（`online_user:{userId}` + `online_token:{token}`），TTL=24h
+- **API**: `GET /api/system/online-user` (分页搜索) / `DELETE /api/system/online-user/:userId` (强退)
+- **页面**: `/system/online-user` — 在线用户列表、强制下线
+
+### 8. 缓存监控
+
+- **API**: 概览信息 / Key 搜索 / Key 详情 / 单个删除 / 清空全部
+- **页面**: `/monitor/cache` — 缓存用量统计、Key 搜索查看管理
+- **支持类型**: string / list / set / hash / zset 的值查看
+
+### 9. 测试框架
 
 - Vitest + @nuxt/test-utils + happy-dom
 - `npm run test` / `npm run test:watch`
 
 ## 认证流程
 
-1. POST `/api/auth/login` → JWT token，前端存 `useCookie('token')`
+1. POST `/api/auth/login` → JWT token，前端存 `useCookie('token')`，同时回写 Redis 在线记录
 2. `server/middleware/auth.ts` 拦截 `/api/*`（白名单除外），注入 `event.context.auth`
 3. `app/middleware/auth.ts` 检查 cookie，无 token 跳 `/login`
 4. admin 角色绕过所有权限检查
@@ -108,7 +132,7 @@ await exportExcel({
 { "statusCode": 401, "message": "..." }
 ```
 
-## 数据库 (10 表)
+## 数据库 (12 表)
 
 已有: `sys_user`, `sys_role`, `sys_permission`, `sys_dict_type`, `sys_dict_data`, `sys_user_role`, `sys_role_permission`, `sys_file`, `sys_category`, `sys_content`
 新增: `sys_audit_log`, `sys_notification`
@@ -123,6 +147,7 @@ await exportExcel({
 - **响应式**: 根容器 `width: 100%`，表格 `overflow-x: auto`
 - **Prisma**: 模型前缀 `Sys`，关联表级联删除
 - **TS 严格模式**: 启用 `typescript.strict`，禁止 `as any`
+- **文档同步**: 每次新增功能后更新 `.env.example`、`AGENTS.md`、`shared/types/api.ts`
 
 ## 开发命令
 

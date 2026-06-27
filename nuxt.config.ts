@@ -21,7 +21,13 @@ export default defineNuxtConfig({
     strict: true,
   },
 
-  nitro: {},
+  nitro: {
+    storage: {
+      redis: process.env.REDIS_URL
+        ? { driver: 'redis', url: process.env.REDIS_URL, base: 'nuxtjsadmin' }
+        : { driver: 'fs', base: './.data/app_cache' },
+    },
+  },
 
   app: {
     head: {

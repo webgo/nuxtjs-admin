@@ -1,8 +1,8 @@
 <template>
-  <el-popover placement="bottom-end" :width="360" trigger="click" :visible="popoverVisible">
+  <el-popover ref="popoverRef" placement="bottom-end" :width="360" trigger="click">
     <template #reference>
-      <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="notification-badge">
-        <el-icon :size="20" style="cursor:pointer" @click="handleOpen">
+      <el-badge :is-dot="unreadCount > 0" class="notification-badge">
+        <el-icon :size="20" class="notification-icon" @click="handleOpen">
           <BellFilled />
         </el-icon>
       </el-badge>
@@ -48,13 +48,15 @@
 
 <script setup lang="ts">
 import { BellFilled } from '@element-plus/icons-vue'
+import { ElPopover } from 'element-plus'
 import type { NotificationItem } from '#shared/types/api'
 
 const router = useRouter()
-const popoverVisible = ref(false)
+const popoverRef = ref<InstanceType<typeof ElPopover>>()
 const list = ref<NotificationItem[]>([])
-const unreadCount = ref(0)
 const loading = ref(false)
+
+const { unreadCount, refreshUnreadCount, fetchNotifications } = useNotification()
 
 function tagType(type: string): 'success' | 'warning' | 'info' {
   if (type === 'system') return 'info'
@@ -79,43 +81,39 @@ function formatTime(t: string): string {
   return d.toLocaleDateString('zh-CN')
 }
 
-async function fetchNotifications() {
+async function loadNotifications() {
   loading.value = true
   try {
-    const [listRes, countRes] = await Promise.all([
-      $fetch<{ code: number; data: { list: NotificationItem[] } }>('/api/system/notification?pageSize=5'),
-      $fetch<{ code: number; data: number }>('/api/system/notification/unread-count'),
-    ])
-    list.value = listRes.data.list
-    unreadCount.value = countRes.data
-  } catch {
-    // ignore
+    list.value = await fetchNotifications()
   } finally {
     loading.value = false
   }
 }
 
+onMounted(() => {
+  loadNotifications()
+})
+
 function handleOpen() {
-  popoverVisible.value = true
-  fetchNotifications()
+  loadNotifications()
 }
 
 async function handleRead(item: NotificationItem) {
   if (item.isRead === 0) {
     await $fetch(`/api/system/notification/${item.id}/read`, { method: 'PUT' })
     item.isRead = 1
-    unreadCount.value = Math.max(0, unreadCount.value - 1)
+    refreshUnreadCount()
   }
 }
 
 async function handleReadAll() {
   await $fetch('/api/system/notification/read-all', { method: 'PUT' })
-  unreadCount.value = 0
   list.value.forEach(i => { i.isRead = 1 })
+  refreshUnreadCount()
 }
 
 function goToPage() {
-  popoverVisible.value = false
+  popoverRef.value?.hide()
   router.push('/system/notification')
 }
 </script>
@@ -204,5 +202,14 @@ function goToPage() {
   text-align: center;
   padding-top: 8px;
   border-top: 1px solid #ebeef5;
+}
+
+.notification-icon {
+  cursor: pointer;
+  color: #909399;
+  transition: color 0.2s;
+}
+.notification-icon:hover {
+  color: #409eff;
 }
 </style>

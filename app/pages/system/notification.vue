@@ -15,7 +15,7 @@
         <el-tab-pane label="未读" name="unread" />
       </el-tabs>
 
-      <div v-loading="loading">
+      <div v-loading="status === 'pending'">
         <div v-if="list.length === 0" style="text-align:center;padding:40px">
           <el-empty description="暂无通知" />
         </div>
@@ -48,7 +48,7 @@
           v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="fetchData"
+          @change="refresh"
         />
       </div>
     </el-card>
@@ -60,13 +60,21 @@ import type { NotificationItem } from '#shared/types/api'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const list = ref<NotificationItem[]>([])
-const total = ref(0)
-const unreadCount = ref(0)
-const loading = ref(false)
+const { unreadCount, refreshUnreadCount } = useNotification()
 const page = ref(1)
 const pageSize = ref(20)
 const activeTab = ref('all')
+
+const query = computed(() => {
+  const q: Record<string, unknown> = { page: page.value, pageSize: pageSize.value }
+  if (activeTab.value === 'unread') q.isRead = 0
+  return q
+})
+const { data, status, refresh } = useLazyFetch('/api/system/notification', {
+  query,
+})
+const list = computed(() => (data.value as any)?.data?.list ?? [])
+const total = computed(() => (data.value as any)?.data?.total ?? 0)
 
 function tagType(type: string): 'success' | 'warning' | 'info' {
   if (type === 'system') return 'info'
@@ -91,44 +99,27 @@ function formatTime(t: string) {
   return d.toLocaleDateString('zh-CN')
 }
 
-async function fetchData() {
-  loading.value = true
-  try {
-    const params: Record<string, unknown> = { page: page.value, pageSize: pageSize.value }
-    if (activeTab.value === 'unread') params.isRead = 0
-
-    const [listRes, countRes] = await Promise.all([
-      $fetch<{ code: number; data: { list: NotificationItem[]; total: number } }>('/api/system/notification', { params }),
-      $fetch<{ code: number; data: number }>('/api/system/notification/unread-count'),
-    ])
-    list.value = listRes.data.list
-    total.value = listRes.data.total
-    unreadCount.value = countRes.data
-  } finally {
-    loading.value = false
-  }
-}
-
 function handleTabChange() {
   page.value = 1
-  fetchData()
 }
 
 async function handleRead(item: NotificationItem) {
   if (item.isRead === 0) {
     await $fetch(`/api/system/notification/${item.id}/read`, { method: 'PUT' })
     item.isRead = 1
-    unreadCount.value = Math.max(0, unreadCount.value - 1)
+    refreshUnreadCount()
   }
 }
 
 async function handleReadAll() {
   await $fetch('/api/system/notification/read-all', { method: 'PUT' })
-  unreadCount.value = 0
-  list.value.forEach(i => { i.isRead = 1 })
+  refreshUnreadCount()
+  refresh()
 }
 
-onMounted(() => fetchData())
+onMounted(() => {
+  refreshUnreadCount()
+})
 </script>
 
 <style scoped>

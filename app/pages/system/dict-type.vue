@@ -1,15 +1,15 @@
 <template>
   <div class="dict-page">
     <el-card class="search-card">
-      <el-form :model="query" inline size="default">
+      <el-form :model="filters" inline size="default">
         <el-form-item label="字典名称">
-          <el-input v-model="query.name" placeholder="请输入" clearable />
+          <el-input v-model="filters.name" placeholder="请输入" clearable />
         </el-form-item>
         <el-form-item label="标识">
-          <el-input v-model="query.code" placeholder="请输入" clearable />
+          <el-input v-model="filters.code" placeholder="请输入" clearable />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="query.status" placeholder="请选择" clearable style="width:120px">
+          <el-select v-model="filters.status" placeholder="请选择" clearable style="width:120px">
             <el-option label="启用" :value="1" />
             <el-option label="禁用" :value="0" />
           </el-select>
@@ -25,7 +25,7 @@
       <div class="table-toolbar">
         <el-button type="primary" @click="handleAdd">新增字典</el-button>
       </div>
-      <el-table :data="dictList" border stripe v-loading="loading">
+      <el-table :data="dictList" border stripe v-loading="status === 'pending'">
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column prop="name" label="字典名称" min-width="150" />
         <el-table-column prop="code" label="标识" width="160" />
@@ -51,11 +51,10 @@
       </el-table>
       <div class="table-pagination">
         <el-pagination
-          v-model:current-page="query.page"
-          v-model:page-size="query.pageSize"
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="fetchData"
         />
       </div>
     </el-card>
@@ -147,9 +146,6 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 import type { DictTypeItem, DictDataItem, ApiResponse, PaginatedData } from '#shared/types/api'
 
-const dictList = ref<DictTypeItem[]>([])
-const total = ref(0)
-const loading = ref(false)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const submitLoading = ref(false)
@@ -165,13 +161,19 @@ const isDataEdit = ref(false)
 const dataSubmitLoading = ref(false)
 const dataFormRef = ref()
 
-const query = reactive({
-  page: 1,
-  pageSize: 10,
+const page = ref(1)
+const pageSize = ref(10)
+const filters = reactive({
   name: '',
   code: '',
   status: undefined as number | undefined,
 })
+
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<DictTypeItem>>>('/api/system/dict-type', {
+  query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
+})
+const dictList = computed(() => data.value?.data?.list ?? [])
+const total = computed(() => data.value?.data?.total ?? 0)
 
 const form = reactive({
   id: 0,
@@ -201,19 +203,8 @@ const dataRules = {
   value: [{ required: true, message: '请输入键值', trigger: 'blur' }],
 }
 
-async function fetchData() {
-  loading.value = true
-  try {
-    const res = await $fetch<ApiResponse<PaginatedData<DictTypeItem>>>('/api/system/dict-type', { params: query })
-    dictList.value = res.data.list
-    total.value = res.data.total
-  } finally {
-    loading.value = false
-  }
-}
-
-function handleSearch() { query.page = 1; fetchData() }
-function handleReset() { query.name = ''; query.code = ''; query.status = undefined; query.page = 1; fetchData() }
+function handleSearch() { page.value = 1 }
+function handleReset() { filters.name = ''; filters.code = ''; filters.status = undefined; page.value = 1 }
 
 function handleAdd() {
   isEdit.value = false
@@ -240,7 +231,7 @@ async function handleSubmit() {
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
-    fetchData()
+    refresh()
   } catch (err: any) {
     ElMessage.error(err.data?.message || '操作失败')
   } finally {
@@ -252,7 +243,7 @@ async function handleDelete(row: DictTypeItem) {
   await ElMessageBox.confirm(`确定删除字典"${row.name}"？`, '提示', { type: 'warning' })
   await $fetch(`/api/system/dict-type/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
-  fetchData()
+  refresh()
 }
 
 // 字典数据管理
@@ -322,7 +313,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleString('zh-CN')
 }
 
-onMounted(() => fetchData())
+// useLazyFetch auto-fetches on mount
 </script>
 
 <style scoped>
