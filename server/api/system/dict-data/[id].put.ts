@@ -3,7 +3,7 @@ import prisma from '../../../utils/prisma'
 export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, 'id'))
   const body = await readBody(event)
-  const { dictTypeId, label, value, sort, status, remark } = body
+  const { dictTypeId, label, value, sort, status, cssClass, remark } = body
 
   const dictData = await prisma.sysDictData.findUnique({ where: { id } })
   if (!dictData) {
@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
   if (value !== undefined) data.value = value
   if (sort !== undefined) data.sort = sort
   if (status !== undefined) data.status = status
+  if (cssClass !== undefined) data.cssClass = cssClass
   if (remark !== undefined) data.remark = remark
 
   await prisma.sysDictData.update({ where: { id }, data })

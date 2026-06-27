@@ -54,7 +54,7 @@
           v-model:page-size="pageSize"
           :total="total"
           layout="total, prev, pager, next, jumper"
-          @change="refresh"
+          @change="() => refresh()"
         />
       </div>
     </el-card>

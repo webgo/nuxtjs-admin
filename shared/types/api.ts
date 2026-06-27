@@ -82,6 +82,17 @@ export interface DictTypeItem {
   createTime: string
 }
 
+/** Element Plus el-tag 支持的 type 值 */
+export type TagType = 'success' | 'warning' | 'danger' | 'info' | 'primary'
+
+/** 带标签颜色的字典选项 */
+export interface DictOption {
+  value: string | number
+  label: string
+  tagType: TagType
+  cssClass?: string
+}
+
 export interface DictDataItem {
   id: number
   dictTypeId: number
@@ -89,6 +100,12 @@ export interface DictDataItem {
   value: string
   sort: number
   status: number
+  cssClass?: string
+  remark?: string
+  createTime?: string
+  updateTime?: string
+  dictName?: string
+  dictCode?: string
 }
 
 // ========== 认证模块 ==========

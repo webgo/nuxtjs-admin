@@ -91,7 +91,13 @@
           <el-button type="primary" size="small" @click="handleDataAdd">新增数据</el-button>
         </div>
         <el-table :data="dictDataList" border stripe size="small" v-loading="dataLoading">
-          <el-table-column prop="label" label="标签" width="120" />
+          <el-table-column label="标签" width="140">
+            <template #default="{ row }">
+              <el-tag :type="tagClassToType(row.cssClass)" size="small">
+                {{ row.label }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="value" label="键值" width="120" />
           <el-table-column prop="sort" label="排序" width="60" />
           <el-table-column label="状态" width="70">
@@ -123,6 +129,25 @@
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="dataForm.sort" :min="0" />
+        </el-form-item>
+        <el-form-item label="Tag 颜色">
+          <el-radio-group v-model="dataForm.cssClass" size="small">
+            <el-radio-button value="">
+              <el-tag size="small" type="info" disable-transitions>默认</el-tag>
+            </el-radio-button>
+            <el-radio-button value="success">
+              <el-tag size="small" type="success" disable-transitions>成功</el-tag>
+            </el-radio-button>
+            <el-radio-button value="warning">
+              <el-tag size="small" type="warning" disable-transitions>警告</el-tag>
+            </el-radio-button>
+            <el-radio-button value="danger">
+              <el-tag size="small" type="danger" disable-transitions>危险</el-tag>
+            </el-radio-button>
+            <el-radio-button value="primary">
+              <el-tag size="small" type="primary" disable-transitions>主要</el-tag>
+            </el-radio-button>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="dataForm.status">
@@ -195,6 +220,7 @@ const dataForm = reactive({
   value: '',
   sort: 0,
   status: 1,
+  cssClass: '',
   remark: '',
 })
 
@@ -267,6 +293,7 @@ function handleDataAdd() {
   dataForm.value = ''
   dataForm.sort = 0
   dataForm.status = 1
+  dataForm.cssClass = ''
   dataForm.remark = ''
   dataFormVisible.value = true
 }
@@ -306,6 +333,12 @@ async function handleDataDelete(row: DictDataItem) {
   ElMessage.success('删除成功')
   const res = await $fetch<ApiResponse<PaginatedData<DictDataItem>>>('/api/system/dict-data', { params: { dictTypeId: currentDictId.value, pageSize: 100 } })
   dictDataList.value = res.data.list
+}
+
+/** cssClass → el-tag type 映射 */
+function tagClassToType(cssClass?: string): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
+  const valid = ['success', 'warning', 'danger', 'info', 'primary'] as const
+  return cssClass && valid.includes(cssClass as any) ? (cssClass as any) : 'info'
 }
 
 function formatDate(d: string) {

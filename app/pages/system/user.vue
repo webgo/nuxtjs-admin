@@ -8,8 +8,12 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="filters.status" placeholder="请选择" clearable style="width:120px">
-            <el-option label="启用" :value="1" />
-            <el-option label="禁用" :value="0" />
+            <el-option
+              v-for="opt in statusOptions"
+              :key="opt.value"
+              :label="opt.label"
+              :value="Number(opt.value)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -39,8 +43,8 @@
         </el-table-column>
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? '启用' : '禁用' }}
+            <el-tag :type="getDictTagType(statusDict, row.status)" size="small">
+              {{ getDictLabel(statusDict, row.status) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -95,8 +99,9 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="form.status">
-            <el-radio :value="1">启用</el-radio>
-            <el-radio :value="0">禁用</el-radio>
+            <el-radio v-for="opt in statusOptions" :key="opt.value" :value="Number(opt.value)">
+              <el-tag :type="opt.tagType" size="small" disable-transitions>{{ opt.label }}</el-tag>
+            </el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注">
@@ -113,7 +118,7 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'auth' })
-import type { UserItem, UserQuery, UserCreateBody, ApiResponse, PaginatedData } from '#shared/types/api'
+import type { UserItem, ApiResponse, PaginatedData, DictOption } from '#shared/types/api'
 
 const dialogVisible = ref(false)
 const isEdit = ref(false)
@@ -133,6 +138,11 @@ const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<UserIte
 })
 const userList = computed(() => data.value?.data?.list ?? [])
 const total = computed(() => data.value?.data?.total ?? 0)
+
+// 字典工具 — 用户状态
+const { getDictOptions, getDictLabel, getDictTagType, dictMap, loadDicts } = useDict()
+const statusDict = computed(() => dictMap.value.sys_user_status ?? [])
+const statusOptions = ref<DictOption[]>([])
 
 const form = reactive({
   id: 0,
@@ -244,8 +254,12 @@ function formatDate(d: string) {
   return new Date(d).toLocaleString('zh-CN')
 }
 
-onMounted(() => {
-  loadRoles()
+onMounted(async () => {
+  await Promise.all([
+    loadRoles(),
+    loadDicts(['sys_user_status']),
+  ])
+  statusOptions.value = await getDictOptions('sys_user_status')
 })
 </script>
 

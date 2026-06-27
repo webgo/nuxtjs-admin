@@ -126,6 +126,7 @@ model SysDictData {
   value      String   @db.VarChar(100)
   sort       Int      @default(0)
   status     Int      @default(1) // 0=禁用, 1=启用
+  cssClass   String?  @default("") @map("css_class") // tag 颜色: success/warning/danger/info/primary
   remark     String?  @db.VarChar(500)
   createTime DateTime @default(now()) @map("create_time")
   updateTime DateTime @updatedAt @map("update_time")

@@ -5,11 +5,13 @@ export default defineEventHandler(async (event) => {
   const page = Number(query.page) || 1
   const pageSize = Number(query.pageSize) || 10
   const dictTypeId = query.dictTypeId ? Number(query.dictTypeId) : undefined
+  const dictCode = query.dictCode as string | undefined
   const label = query.label as string | undefined
   const status = query.status !== undefined ? Number(query.status) : undefined
 
   const where: any = {}
   if (dictTypeId) where.dictTypeId = dictTypeId
+  if (dictCode) where.dictType = { code: dictCode }
   if (label) where.label = { contains: label }
   if (status !== undefined) where.status = status
 
@@ -35,6 +37,7 @@ export default defineEventHandler(async (event) => {
     value: d.value,
     sort: d.sort,
     status: d.status,
+    cssClass: d.cssClass,
     remark: d.remark,
     createTime: d.createTime,
     updateTime: d.updateTime,

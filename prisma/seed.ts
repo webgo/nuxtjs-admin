@@ -171,6 +171,21 @@ async function main() {
     })
   }
 
+  // 用户状态字典数据
+  const dictType3 = await prisma.sysDictType.findUnique({ where: { code: 'sys_user_status' } })
+  if (dictType3) {
+    await prisma.sysDictData.upsert({
+      where: { id: 3 },
+      update: { dictTypeId: dictType3.id, label: '正常', value: '1', sort: 1, status: 1, cssClass: 'success' },
+      create: { id: 3, dictTypeId: dictType3.id, label: '正常', value: '1', sort: 1, status: 1, cssClass: 'success' },
+    })
+    await prisma.sysDictData.upsert({
+      where: { id: 4 },
+      update: { dictTypeId: dictType3.id, label: '停用', value: '0', sort: 2, status: 1, cssClass: 'danger' },
+      create: { id: 4, dictTypeId: dictType3.id, label: '停用', value: '0', sort: 2, status: 1, cssClass: 'danger' },
+    })
+  }
+
   console.log('✅ Seed data created successfully!')
   console.log('   Admin user: admin / admin123')
 }
