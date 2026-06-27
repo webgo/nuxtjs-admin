@@ -1,4 +1,4 @@
-import { cacheScan, cacheTtl, cacheType, cacheKey, getCache } from '../../../utils/cache'
+import { cacheScan, cacheTtl, cacheType, cacheKey, cacheStrlen, cacheLlen, cacheScard, cacheHlen, cacheZcard } from '../../../utils/cache'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
   try {
     // 使用 cacheKey 补全前缀（如 online_user:* → nuxtjsadmin:online_user:*）
     const scanPattern = cacheKey(pattern)
-    const cache = getCache()
 
     // 使用 SCAN 收集匹配的 key
     const allKeys: string[] = []
@@ -35,19 +34,19 @@ export default defineEventHandler(async (event) => {
         let size = '0'
         try {
           if (type === 'string') {
-            const len = await cache.strlen(key)
+            const len = await cacheStrlen(key)
             size = len < 1024 ? `${len} B` : `${(len / 1024).toFixed(1)} KB`
           } else if (type === 'list') {
-            const len = await cache.llen(key)
+            const len = await cacheLlen(key)
             size = `${len} items`
           } else if (type === 'set') {
-            const len = await cache.scard(key)
+            const len = await cacheScard(key)
             size = `${len} members`
           } else if (type === 'hash') {
-            const len = await cache.hlen(key)
+            const len = await cacheHlen(key)
             size = `${len} fields`
           } else if (type === 'zset') {
-            const len = await cache.zcard(key)
+            const len = await cacheZcard(key)
             size = `${len} members`
           }
         } catch {

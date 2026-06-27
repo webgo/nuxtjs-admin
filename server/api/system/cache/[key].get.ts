@@ -2,7 +2,8 @@ import {
   cacheGetRaw,
   cacheTtl,
   cacheType,
-  getCache,
+  cacheExists,
+  cacheHgetall,
 } from "../../../utils/cache";
 
 export default defineEventHandler(async (event) => {
@@ -12,8 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const cache = getCache();
-    const exists = await cache.exists(key);
+    const exists = await cacheExists(key);
     if (!exists) {
       throw createError({ statusCode: 404, message: "Key 不存在" });
     }
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     // 对特定类型尝试获取更多信息
     let detail: unknown = value;
     if (type === "hash") {
-      detail = await cache.hgetall(key);
+      detail = await cacheHgetall(key);
     }
 
     // 尝试 JSON 美化显示

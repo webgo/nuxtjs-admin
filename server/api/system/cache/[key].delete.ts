@@ -1,4 +1,4 @@
-import { cacheDel, getCache } from '../../../utils/cache'
+import { cacheDel, cacheExists } from '../../../utils/cache'
 
 export default defineEventHandler(async (event) => {
   const key = getRouterParam(event, 'key')
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const exists = await getCache().exists(key)
+    const exists = await cacheExists(key)
     if (!exists) {
       throw createError({ statusCode: 404, message: 'Key 不存在' })
     }
