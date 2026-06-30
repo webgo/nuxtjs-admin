@@ -4,3 +4,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* 使el-message的z-index最高，防止被Dialog等组件遮挡 */
+.el-message {
+  z-index: 999999 !important; /* 设置一个足够大的值，确保在 Dialog 之上 */
+}
