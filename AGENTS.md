@@ -10,6 +10,7 @@ Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手�
 |---|---|
 | 框架 | Nuxt 4 (Vue 3 + Vite + Nitro) |
 | UI | Element Plus |
+| CSS | Tailwind CSS (仅 Portal 模块使用) |
 | ORM | Prisma 7 + MariaDB Adapter |
 | 数据库 | MySQL 8.0 |
 | 缓存 | Redis (ioredis) |
@@ -17,6 +18,7 @@ Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手�
 | 测试 | Vitest + @nuxt/test-utils |
 | 导出 | ExcelJS |
 | 语言 | TypeScript (strict mode) |
+| i18n | @nuxtjs/i18n (中文/English/日本語) |
 
 ## 目录结构
 
@@ -123,6 +125,8 @@ await exportExcel({
 - **Portal 首页** `/portal` — UberEats 风格的美食外送首页，含英雄区、美食分类、餐厅推荐、订餐流程展示
 -   **路由规则**: `/**` 重定向到 `/portal`；`/admin/**` 为后台管理页面（需要登录）；`/portal/**` 使用 SSR 渲染（见 `nuxt.config.ts`）
 - **设计语言**: UberEats 风格（主色 #06C167），现代化卡片式布局，全响应式
+- **样式方案**: Portal 模块统一使用 Tailwind CSS 开发，不使用 `<style scoped>` 或 Element Plus 样式。后台管理页面仍使用 Element Plus + SCSS。
+- **i18n 国际化**: Portal 模块使用 `@nuxtjs/i18n`，翻译文件位于 `i18n/locales/`，目前支持 `tw` / `en` / `jp` 三种语言。URL 格式为 `/portal/tw`、`/portal/en`、`/portal/jp`，方便分享和刷新保持语言状态。页脚底部提供语言切换按钮。
 
 ## 认证流程
 
@@ -160,6 +164,8 @@ await exportExcel({
 - **响应式**: 根容器 `width: 100%`，表格 `overflow-x: auto`
 - **Prisma**: 模型前缀 `Sys`，关联表级联删除
 - **TS 严格模式**: 启用 `typescript.strict`，禁止 `as any`
+- **Portal 样式**: Portal 模块所有页面统一使用 Tailwind CSS utility classes，禁止编写自定义 CSS（不使用 `<style scoped>`）
+- **i18n 国际化**: Portal 模块使用 `@nuxtjs/i18n`，翻译文件位于 `i18n/locales/`，目前支持 `tw` / `en` / `jp` 三种语言。URL 格式为 `/portal/tw`、`/portal/en`、`/portal/jp`。
 - **文档同步**: 每次新增功能后更新 `.env.example`、`AGENTS.md`、`shared/types/api.ts`
 
 ## 开发命令
