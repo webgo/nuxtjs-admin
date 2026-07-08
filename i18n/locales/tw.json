@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "login": "登入",
+    "signup": "註冊"
+  },
+  "hero": {
+    "title": "預約附近餐點外送服務",
+    "addressPlaceholder": "輸入地址",
+    "delivery": "外送",
+    "search": "開始搜尋",
+    "loginHint": "登入以查看最近地址"
+  },
+  "features": {
+    "card1": { "title": "以美食獎勵員工辛勞", "subtitle": "建立企業帳戶" },
+    "card2": { "title": "協助餐廳夥伴外送美食", "subtitle": "與我們合作" },
+    "card3": { "title": "透過 Uber Eats 平台接外送", "subtitle": "以合作外送夥伴身分加入" }
+  },
+  "cities": {
+    "title": "附近的城市",
+    "viewAll": "查看超過 500 座城市",
+    "mapLabel": "地圖區域",
+    "taichung": "台中",
+    "tainan": "台南",
+    "taipei": "台北",
+    "kaohsiung": "高雄",
+    "hsinchu": "新竹",
+    "country": "台灣"
+  },
+  "countries": {
+    "title": "提供 Uber Eats 優食的國家/地區",
+    "viewAll": "查看所有地區",
+    "us": "美國",
+    "ca": "加拿大",
+    "uk": "英國",
+    "fr": "法國",
+    "de": "德國",
+    "jp": "日本",
+    "kr": "韓國",
+    "au": "澳洲",
+    "nz": "紐西蘭",
+    "sg": "新加坡",
+    "my": "馬來西亞",
+    "th": "泰國",
+    "mx": "墨西哥",
+    "br": "巴西",
+    "ar": "阿根廷"
+  },
+  "footer": {
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "col1": { "title": "關於我們", "link1": "新聞稿", "link2": "我們的部落格", "link3": "以合作外送夥伴身分加入" },
+    "col2": { "title": "探索", "link1": "查看所有城市", "link2": "查看所有國家/地區", "link3": "查看所有餐廳" },
+    "col3": { "title": "隱私權與條款", "link1": "隱私權政策", "link2": "使用條款", "link3": "Cookie 政策" },
+    "col4": { "title": "協助與支援", "link1": "常見問題", "link2": "聯絡我們", "link3": "中文" },
+    "legal": "隱私權 · 使用條款 · 網站使用規範 · 關於此頁面的資訊 · © {year} Uber Technologies Inc."
+  },
+  "languageSwitcher": {
+    "label": "語言",
+    "zh-TW": "中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "login": "ログイン",
+    "signup": "登録"
+  },
+  "hero": {
+    "title": "近くの料理をデリバリー予約",
+    "addressPlaceholder": "住所を入力",
+    "delivery": "デリバリー",
+    "search": "検索",
+    "loginHint": "最近の住所を見るにはログイン"
+  },
+  "features": {
+    "card1": { "title": "美味しい食事でチームを表彰", "subtitle": "ビジネスアカウントを作成" },
+    "card2": { "title": "レストランの配達をサポート", "subtitle": "パートナーになる" },
+    "card3": { "title": "Uber Eats で配達する", "subtitle": "配達パートナーとして参加" }
+  },
+  "cities": {
+    "title": "近くの都市",
+    "viewAll": "すべての都市を見る",
+    "mapLabel": "エリアマップ",
+    "taichung": "台中",
+    "tainan": "台南",
+    "taipei": "台北",
+    "kaohsiung": "高雄",
+    "hsinchu": "新竹",
+    "country": "台湾"
+  },
+  "countries": {
+    "title": "Uber Eats を利用できる国・地域",
+    "viewAll": "すべての地域を見る",
+    "us": "アメリカ",
+    "ca": "カナダ",
+    "uk": "イギリス",
+    "fr": "フランス",
+    "de": "ドイツ",
+    "jp": "日本",
+    "kr": "韓国",
+    "au": "オーストラリア",
+    "nz": "ニュージーランド",
+    "sg": "シンガポール",
+    "my": "マレーシア",
+    "th": "タイ",
+    "mx": "メキシコ",
+    "br": "ブラジル",
+    "ar": "アルゼンチン"
+  },
+  "footer": {
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "col1": { "title": "Uber Eats について", "link1": "プレスリリース", "link2": "ブログ", "link3": "配達パートナーとして参加" },
+    "col2": { "title": "探索", "link1": "すべての都市を見る", "link2": "すべての国・地域を見る", "link3": "すべてのレストランを見る" },
+    "col3": { "title": "プライバシーと利用規約", "link1": "プライバシーポリシー", "link2": "利用規約", "link3": "Cookie ポリシー" },
+    "col4": { "title": "ヘルプとサポート", "link1": "よくある質問", "link2": "お問い合わせ", "link3": "日本語" },
+    "legal": "プライバシー · 利用規約 · サイト利用 · このページについて · © {year} Uber Technologies Inc."
+  },
+  "languageSwitcher": {
+    "label": "言語",
+    "zh-TW": "中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}

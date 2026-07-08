@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@element-plus/nuxt', '@pinia/nuxt'],
+  modules: ['@element-plus/nuxt', '@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/i18n'],
 
   elementPlus: {
     icon: 'ElIcon',
@@ -40,5 +40,16 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { redirect: '/portal' },
     '/portal/**': { ssr: true },
+  },
+
+  i18n: {
+    defaultLocale: 'tw',
+    locales: [
+      { code: 'tw', name: '中文', file: 'tw.json' },
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'jp', name: '日本語', file: 'jp.json' },
+    ],
+    strategy: 'no_prefix',
+    detectBrowserLanguage: false,
   },
 })

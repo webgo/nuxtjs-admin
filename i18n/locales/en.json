@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "hero": {
+    "title": "Order food delivery near you",
+    "addressPlaceholder": "Enter your address",
+    "delivery": "Delivery",
+    "search": "Search Now",
+    "loginHint": "Login to see recent addresses"
+  },
+  "features": {
+    "card1": { "title": "Reward your team with food", "subtitle": "Create a business account" },
+    "card2": { "title": "Help restaurants deliver", "subtitle": "Partner with us" },
+    "card3": { "title": "Deliver with Uber Eats", "subtitle": "Join as a delivery partner" }
+  },
+  "cities": {
+    "title": "Nearby cities",
+    "viewAll": "View all cities",
+    "mapLabel": "Map area",
+    "taichung": "Taichung",
+    "tainan": "Tainan",
+    "taipei": "Taipei",
+    "kaohsiung": "Kaohsiung",
+    "hsinchu": "Hsinchu",
+    "country": "Taiwan"
+  },
+  "countries": {
+    "title": "Countries with Uber Eats",
+    "viewAll": "View all regions",
+    "us": "United States",
+    "ca": "Canada",
+    "uk": "United Kingdom",
+    "fr": "France",
+    "de": "Germany",
+    "jp": "Japan",
+    "kr": "South Korea",
+    "au": "Australia",
+    "nz": "New Zealand",
+    "sg": "Singapore",
+    "my": "Malaysia",
+    "th": "Thailand",
+    "mx": "Mexico",
+    "br": "Brazil",
+    "ar": "Argentina"
+  },
+  "footer": {
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "col1": { "title": "About Us", "link1": "Press Releases", "link2": "Our Blog", "link3": "Join as a delivery partner" },
+    "col2": { "title": "Explore", "link1": "View all cities", "link2": "View all countries", "link3": "View all restaurants" },
+    "col3": { "title": "Privacy & Terms", "link1": "Privacy Policy", "link2": "Terms of Service", "link3": "Cookie Policy" },
+    "col4": { "title": "Help & Support", "link1": "FAQ", "link2": "Contact Us", "link3": "English" },
+    "legal": "Privacy · Terms · Site Usage · About This Page · © {year} Uber Technologies Inc."
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "zh-TW": "中文",
+    "en": "English",
+    "ja": "日本語"
+  }
+}
