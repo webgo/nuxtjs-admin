@@ -1,111 +1,207 @@
 <template>
-  <div class="ue-page">
+  <div class="font-sans bg-white text-black w-full">
     <!-- 导航栏 -->
-    <nav class="navbar">
-      <div class="nav-left">
-        <div class="nav-logo">
-          <svg viewBox="0 0 24 24" fill="black"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /></svg>
+    <nav
+      class="flex justify-between items-center px-10 py-4 bg-white h-16 sticky top-0 z-[100] max-md:px-5 max-md:py-3"
+    >
+      <div class="flex items-center gap-[15px]">
+        <div class="font-black text-xl tracking-tight flex items-center">
+          <svg class="w-5 h-5 mr-[5px]" viewBox="0 0 24 24" fill="black">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            />
+          </svg>
           Uber Eats
         </div>
       </div>
-      <div class="nav-right">
-        <NuxtLink to="/admin/login" class="btn-login">登入</NuxtLink>
-        <NuxtLink to="/admin/login" class="btn-signup">註冊</NuxtLink>
-        <div class="nav-cart">0</div>
+      <div class="flex items-center gap-5 text-sm font-semibold">
+        <NuxtLink to="/admin/login" class="no-underline cursor-pointer">{{
+          $t("nav.login")
+        }}</NuxtLink>
+        <NuxtLink
+          to="/admin/login"
+          class="bg-black text-white px-4 py-2 rounded-[20px] cursor-pointer no-underline"
+          >{{ $t("nav.signup") }}</NuxtLink
+        >
+        <div
+          class="bg-black text-white size-[30px] rounded-full flex items-center justify-center text-sm cursor-pointer"
+        >
+          0
+        </div>
       </div>
     </nav>
 
     <!-- 英雄横幅 -->
-    <section class="hero">
-      <div class="hero-overlay">
-        <h1>預約附近餐點外送服務</h1>
+    <section
+      class="relative min-h-[calc(100vh-64px)] flex items-center bg-cover bg-center bg-no-repeat max-md:min-h-screen max-md:px-5"
+      style="
+        background-image: url(&quot;https://www.ubereats.com/_static/c413f20400e04805.webp&quot;);
+      "
+    >
+      <div
+        class="bg-transparent py-8 max-w-[900px] w-full ml-[10%] box-border max-md:max-w-full max-md:ml-0"
+      >
+        <h1 class="text-[32px] font-bold mb-6 tracking-wide text-black">
+          {{ $t("hero.title") }}
+        </h1>
 
-        <div class="search-row">
-          <div class="search-input-wrapper">
-            <input v-model="address" type="text" placeholder="輸入地址" />
+        <div
+          class="flex items-center gap-2.5 flex-wrap max-md:flex-col max-md:items-stretch"
+        >
+          <div
+            class="w-[500px] max-w-[calc(100vw-40px)] h-[55px] bg-white rounded-lg flex items-center px-4 shadow-md shrink-0 max-md:w-full"
+          >
+            <input
+              v-model="address"
+              type="text"
+              :placeholder="$t('hero.addressPlaceholder')"
+              class="w-full h-full border-0 text-base outline-none bg-transparent"
+            />
           </div>
 
-          <div class="dropdown-btn">
-            <span>🚚 外送</span>
+          <div
+            class="h-[55px] bg-white border border-gray-200 rounded-lg px-5 text-[15px] font-medium text-gray-700 flex items-center gap-2 cursor-pointer shadow-md shrink-0 max-md:w-full max-md:justify-center"
+          >
+            <span>🚚 {{ $t("hero.delivery") }}</span>
           </div>
 
-          <button class="search-btn" @click="handleSearch">開始搜尋</button>
+          <button
+            class="h-[55px] bg-black text-white border-0 rounded-lg px-8 font-semibold text-base cursor-pointer shrink-0 transition-colors duration-200 hover:bg-gray-800 max-md:w-full max-md:justify-center"
+            @click="handleSearch"
+          >
+            {{ $t("hero.search") }}
+          </button>
         </div>
 
-        <div class="hero-sub" @click="handleLogin">登入以查看最近地址</div>
+        <div
+          class="mt-4 text-sm text-black underline cursor-pointer"
+          @click="handleLogin"
+        >
+          {{ $t("hero.loginHint") }}
+        </div>
       </div>
     </section>
 
     <!-- 内容主体 -->
-    <div class="full-width-content">
-
+    <div class="w-full px-12 box-border max-md:px-5">
       <!-- 三栏卡片 -->
-      <section class="features">
-        <article v-for="(card, idx) in featureCards" :key="idx" class="feature-card">
-          <div class="feature-img" :style="{ backgroundImage: `url(${card.img})` }" />
-          <div class="feature-content">
-            <h3>{{ card.title }}</h3>
-            <p>{{ card.subtitle }}</p>
+      <section class="py-[60px] grid grid-cols-3 gap-5 max-md:grid-cols-1">
+        <article
+          v-for="(card, idx) in featureCards"
+          :key="idx"
+          class="bg-white rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
+        >
+          <div
+            class="w-full aspect-[5/3] bg-cover bg-center"
+            :style="{ backgroundImage: `url(${card.img})` }"
+          />
+          <div class="p-5">
+            <h3 class="text-3xl font-bold mb-2">{{ card.title }}</h3>
+            <p class="text-base text-gray-500">{{ card.subtitle }}</p>
           </div>
         </article>
       </section>
 
       <!-- 附近城市 -->
-      <section class="cities-section">
-        <div class="section-header">
-          <h2>附近的城市</h2>
-          <a href="#">查看超過 500 座城市 &gt;</a>
+      <section class="py-10">
+        <div class="flex justify-between items-end mb-8">
+          <h2 class="text-3xl font-bold">{{ $t("cities.title") }}</h2>
+          <a href="#" class="text-base text-black underline"
+            >{{ $t("cities.viewAll") }} &gt;</a
+          >
         </div>
 
-        <div class="map-placeholder">
-          <span>📍 地圖區域</span>
+        <div
+          ref="mapContainer"
+          class="w-full h-[400px] rounded-lg mb-8 relative bg-gray-100"
+        >
+          <div
+            v-if="!mapReady"
+            class="absolute inset-0 flex items-center justify-center text-base text-gray-500"
+          >
+            <span>📍 {{ $t("cities.mapLabel") }}</span>
+          </div>
         </div>
 
-        <div class="city-grid">
-          <div v-for="city in cities" :key="city.name" class="city-item">
-            <span>{{ city.name }}</span>
-            <span>{{ city.country }}</span>
+        <div class="grid grid-cols-5 gap-5 max-md:grid-cols-2">
+          <div v-for="city in cities" :key="city.name" class="flex flex-col">
+            <span class="font-semibold text-base mb-0.5">{{ city.name }}</span>
+            <span class="text-sm text-gray-500">{{ city.country }}</span>
           </div>
         </div>
       </section>
 
       <!-- 国家/地区 -->
-      <section class="countries-section">
-        <div class="section-header">
-          <h2>提供 Uber Eats 優食的國家/地區</h2>
-          <a href="#">查看所有地區 &gt;</a>
+      <section class="py-10 border-t border-gray-100">
+        <div class="flex justify-between items-end mb-8">
+          <h2 class="text-3xl font-bold">{{ $t("countries.title") }}</h2>
+          <a href="#" class="text-base text-black underline"
+            >{{ $t("countries.viewAll") }} &gt;</a
+          >
         </div>
-        <div class="country-grid">
-          <div v-for="country in countries" :key="country" class="country-item">{{ country }}</div>
+        <div class="grid grid-cols-5 gap-5 mt-8 max-md:grid-cols-2">
+          <div
+            v-for="country in countries"
+            :key="country"
+            class="text-base mb-2 cursor-pointer hover:underline"
+          >
+            {{ country }}
+          </div>
         </div>
       </section>
     </div>
 
     <!-- 底部 -->
-    <footer class="footer">
-      <div class="footer-top">
-        <div class="footer-logo">Uber Eats</div>
-        <div class="footer-apps">
-          <span class="app-btn">🛒 App Store</span>
-          <span class="app-btn">▶️ Google Play</span>
+    <footer
+      class="bg-white border-t border-gray-100 pt-10 px-12 pb-5 w-full max-md:px-5 max-md:pb-5 max-md:pt-10"
+    >
+      <div class="flex justify-between mb-8">
+        <div class="text-xl font-black">Uber Eats</div>
+        <div class="flex gap-2.5">
+          <span
+            class="bg-black text-white px-4 py-2 rounded text-xs flex items-center gap-1.5 cursor-pointer"
+            >🛒 {{ $t("footer.appStore") }}</span
+          >
+          <span
+            class="bg-black text-white px-4 py-2 rounded text-xs flex items-center gap-1.5 cursor-pointer"
+            >▶️ {{ $t("footer.googlePlay") }}</span
+          >
         </div>
       </div>
 
-      <div class="footer-grid">
-        <div v-for="col in footerColumns" :key="col.title" class="footer-col">
-          <h4>{{ col.title }}</h4>
+      <div
+        class="grid grid-cols-4 gap-5 py-8 border-t border-gray-100 max-md:grid-cols-2"
+      >
+        <div v-for="col in footerColumns" :key="col.title">
+          <h4 class="text-base font-semibold mb-4">{{ col.title }}</h4>
           <ul>
-            <li v-for="link in col.links" :key="link">{{ link }}</li>
+            <li
+              v-for="link in col.links"
+              :key="link"
+              class="mb-2.5 text-base text-gray-700 cursor-pointer hover:underline"
+            >
+              {{ link }}
+            </li>
           </ul>
         </div>
       </div>
 
-      <div class="footer-bottom">
-        <div class="footer-bottom-social">
-          <span v-for="s in socialItems" :key="s">{{ s }}</span>
+      <div
+        class="flex justify-between text-[11px] text-gray-500 pt-4 border-t border-gray-100 max-md:flex-col max-md:gap-3"
+      >
+        <div class="flex gap-3">
+          <button
+            v-for="lang in availableLocales"
+            :key="lang.code"
+            class="cursor-pointer hover:underline underline-offset-2"
+            :class="locale === lang.code ? 'font-semibold text-black' : ''"
+            @click="switchLanguage(lang.code)"
+          >
+            {{ lang.name }}
+          </button>
         </div>
         <div>
-          隱私權 · 使用條款 · 網站使用規範 · 關於此頁面的資訊 · © {{ currentYear }} Uber Technologies Inc.
+          {{ $t("footer.legal", { year: currentYear }) }}
         </div>
       </div>
     </footer>
@@ -113,475 +209,233 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'portal' })
+definePageMeta({
+  layout: "portal",
+  path: "/portal/:locale?",
+});
 
-const address = ref('')
-const currentYear = ref(new Date().getFullYear())
+const { t, locale, locales, setLocale } = useI18n();
+const route = useRoute();
 
-const featureCards = [
-  { img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600', title: '以美食獎勵員工辛勞', subtitle: '建立企業帳戶' },
-  { img: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=600', title: '協助餐廳夥伴外送美食', subtitle: '與我們合作' },
-  { img: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=600', title: '透過 Uber Eats 平台接外送', subtitle: '以合作外送夥伴身分加入' },
-]
+const address = ref("");
+const currentYear = ref(new Date().getFullYear());
 
-const cities = [
-  { name: '台中', country: '台灣' },
-  { name: '台南', country: '台灣' },
-  { name: '台北', country: '台灣' },
-  { name: '高雄', country: '台灣' },
-  { name: '新竹', country: '台灣' },
-]
+// 高德地图
+const mapContainer = ref<HTMLDivElement>();
+const mapReady = ref(false);
+let mapInstance: any = null;
 
-const countries = [
-  '美國', '加拿大', '英國', '法國', '德國',
-  '日本', '韓國', '澳洲', '紐西蘭', '新加坡',
-  '馬來西亞', '泰國', '墨西哥', '巴西', '阿根廷',
-]
+interface CityMarker {
+  name: string;
+  lng: number;
+  lat: number;
+}
 
-const footerColumns = [
-  {
-    title: '關於我們',
-    links: ['新聞稿', '我們的部落格', '以合作外送夥伴身分加入'],
-  },
-  {
-    title: '探索',
-    links: ['查看所有城市', '查看所有國家/地區', '查看所有餐廳'],
-  },
-  {
-    title: '隱私權與條款',
-    links: ['隱私權政策', '使用條款', 'Cookie 政策'],
-  },
-  {
-    title: '協助與支援',
-    links: ['常見問題', '聯絡我們', '中文'],
-  },
-]
+const cityMarkers: CityMarker[] = [
+  { name: "台北市", lng: 121.5654, lat: 25.033 },
+  { name: "台中市", lng: 120.6736, lat: 24.1477 },
+  { name: "台南市", lng: 120.1888, lat: 22.9984 },
+  { name: "高雄市", lng: 120.2942, lat: 22.6168 },
+  { name: "新竹市", lng: 120.9675, lat: 24.8067 },
+];
 
-const socialItems = ['FB', 'IG', 'TW', 'YT']
+type LocaleCode = "tw" | "en" | "jp";
+const VALID_LOCALES: LocaleCode[] = ["tw", "en", "jp"];
+
+// 从 URL 路径读取语言并设置（首次加载 / 刷新时）
+onMounted(async () => {
+  const localeParam = route.params.locale;
+  if (
+    localeParam &&
+    typeof localeParam === "string" &&
+    VALID_LOCALES.includes(localeParam as LocaleCode)
+  ) {
+    if (localeParam !== locale.value) {
+      setLocale(localeParam as LocaleCode);
+    }
+  }
+
+  // 等待 DOM 就绪后初始化高德地图
+  await nextTick();
+  await initMap();
+});
+
+const availableLocales = computed(() => {
+  return (
+    locales.value as Array<{ code: string; name: string; file: string }>
+  ).filter((l) => l.code);
+});
+
+// 功能卡片（显式依赖 locale 确保切换时重新计算）
+const featureCards = computed(() => {
+  void locale.value;
+  return [
+    {
+      img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600",
+      title: t("features.card1.title"),
+      subtitle: t("features.card1.subtitle"),
+    },
+    {
+      img: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=600",
+      title: t("features.card2.title"),
+      subtitle: t("features.card2.subtitle"),
+    },
+    {
+      img: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=600",
+      title: t("features.card3.title"),
+      subtitle: t("features.card3.subtitle"),
+    },
+  ];
+});
+
+// 城市列表
+const cityKeys = [
+  "taichung",
+  "tainan",
+  "taipei",
+  "kaohsiung",
+  "hsinchu",
+] as const;
+
+const cities = computed(() => {
+  void locale.value;
+  return cityKeys.map((key) => ({
+    name: t(`cities.${key}`),
+    country: t("cities.country"),
+  }));
+});
+
+// 国家/地区列表
+const countryKeys = [
+  "us",
+  "ca",
+  "uk",
+  "fr",
+  "de",
+  "jp",
+  "kr",
+  "au",
+  "nz",
+  "sg",
+  "my",
+  "th",
+  "mx",
+  "br",
+  "ar",
+] as const;
+
+const countries = computed(() => {
+  void locale.value;
+  return countryKeys.map((key) => t(`countries.${key}`));
+});
+
+// 底部栏目
+const footerColumns = computed(() => {
+  void locale.value;
+  return [
+    {
+      title: t("footer.col1.title"),
+      links: [
+        t("footer.col1.link1"),
+        t("footer.col1.link2"),
+        t("footer.col1.link3"),
+      ],
+    },
+    {
+      title: t("footer.col2.title"),
+      links: [
+        t("footer.col2.link1"),
+        t("footer.col2.link2"),
+        t("footer.col2.link3"),
+      ],
+    },
+    {
+      title: t("footer.col3.title"),
+      links: [
+        t("footer.col3.link1"),
+        t("footer.col3.link2"),
+        t("footer.col3.link3"),
+      ],
+    },
+    {
+      title: t("footer.col4.title"),
+      links: [
+        t("footer.col4.link1"),
+        t("footer.col4.link2"),
+        t("footer.col4.link3"),
+      ],
+    },
+  ];
+});
+
+async function initMap() {
+  if (!mapContainer.value) return;
+
+  const AMapLoader = (await import("@amap/amap-jsapi-loader")).default;
+  const AMap = await AMapLoader.load({
+    key: "2800db7c8be2584b74a978c6297c2e2c",
+    version: "1.4.15",
+  });
+
+  mapInstance = new AMap.Map(mapContainer.value, {
+    features: ["bg", "building", "point"],
+    center: [120.7, 23.7],
+    zoom: 7,
+    zoomEnable: false,
+    dragEnable: false,
+    scrollWheel: false,
+    doubleClickZoom: false,
+    touchZoom: false,
+    keyboardEnable: false,
+    pitchEnable: false,
+    showIndoorMap: false,
+    showLabel: false,
+  });
+
+  const markers: any[] = [];
+
+  cityMarkers.forEach((city) => {
+    const marker = new AMap.Marker({
+      position: [city.lng, city.lat],
+      content: `<div style="width:10px;height:10px;background:#000;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>`,
+      offset: new AMap.Pixel(-5, -5),
+      label: {
+        content: `<div class="amap-marker-my">${city.name}</div>`,
+        direction: "top",
+        offset: new AMap.Pixel(0, -6),
+      },
+    });
+    mapInstance!.add(marker);
+    markers.push(marker);
+  });
+
+  mapReady.value = true;
+}
+
+async function switchLanguage(code: string) {
+  await navigateTo(`/portal/${code === "tw" ? "" : code}`, { replace: true });
+  await setLocale(code as LocaleCode);
+}
 
 function handleSearch() {
   if (address.value.trim()) {
-    console.log('Searching:', address.value)
+    console.log("Searching:", address.value);
   }
 }
 
 function handleLogin() {
-  navigateTo('/admin/login')
+  navigateTo("/admin/login");
 }
 </script>
 
 <style>
-/* 全局重置 — 非 scoped */
-html, body {
-  margin: 0;
-  padding: 0;
-}
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-</style>
-
-<style scoped>
-/* 页面基础 */
-.ue-page {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #fff;
-  color: #000;
-  width: 100%;
-}
-.ue-page a {
-  text-decoration: none;
-  color: inherit;
-}
-.ue-page ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* 全屏宽度 + 左右间距 */
-.full-width-content {
-  width: 100%;
-  padding: 0 50px;
-  box-sizing: border-box;
-}
-
-/* ===== 顶部导航 ===== */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 40px;
-  background: #fff;
-  height: 64px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.nav-logo {
-  font-weight: 900;
-  font-size: 20px;
-  letter-spacing: -1px;
-  display: flex;
-  align-items: center;
-}
-.nav-logo svg {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-size: 14px;
-  font-weight: 600;
-}
-.btn-login {
-  cursor: pointer;
-}
-.nav-right .btn-signup {
-  background: #000;
-  color: #fff !important;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  text-decoration: none;
-}
-.nav-cart {
-  background: #000;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* ===== Hero ===== */
-.hero {
-  position: relative;
-  height: calc(100vh - 64px);
-  background: url('https://www.ubereats.com/_static/c413f20400e04805.webp') center / cover no-repeat;
-  display: flex;
-  align-items: center;
-}
-.hero-overlay {
-  background: transparent;
-  padding: 30px 0;
-  max-width: 900px;
-  width: 100%;
-  margin-left: 10%;
-  border-radius: 0;
-  box-sizing: border-box;
-}
-.hero h1 {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 25px;
-  letter-spacing: 1px;
-  color: #000;
-}
-
-/* 搜索栏 */
-.search-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.search-input-wrapper {
-  width: 500px;
-  max-width: calc(100vw - 40px);
-  height: 55px;
-  background: #fff;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-.search-input-wrapper input {
-  width: 100%;
-  height: 100%;
-  border: none;
-  font-size: 16px;
-  outline: none;
-  background: transparent;
-  font-family: inherit;
-}
-.dropdown-btn {
-  height: 55px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 0 20px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  font-family: inherit;
-}
-.search-btn {
-  height: 55px;
-  background: #000;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0 32px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.2s;
-  font-family: inherit;
-}
-.search-btn:hover {
-  background: #333;
-}
-.hero-sub {
-  margin-top: 15px;
-  font-size: 14px;
-  color: #000;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* ===== 三栏卡片 ===== */
-.features {
-  padding: 60px 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.feature-card {
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.feature-card:hover {
-  transform: scale(1.02);
-}
-.feature-img {
-  width: 100%;
-  aspect-ratio: 5 / 3;
-  background-size: cover;
-  background-position: center;
-}
-.feature-content {
-  padding: 20px;
-}
-.feature-content h3 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.feature-content p {
-  font-size: 16px;
-  color: #666;
-}
-
-/* ===== 城市列表 & 国家列表 ===== */
-.cities-section {
-  padding: 40px 0;
-}
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 30px;
-}
-.section-header h2 {
-  font-size: 28px;
-  font-weight: 700;
-}
-.section-header a {
-  font-size: 16px;
-  color: #000;
-  text-decoration: underline;
-}
-
-/* 地图区域 */
-.map-placeholder {
-  width: 100%;
-  height: 360px;
-  background-color: #f2f2f2;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: #666;
-  background-image: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop');
-  background-size: cover;
-  background-position: center;
-}
-
-.city-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-.city-item {
-  display: flex;
-  flex-direction: column;
-}
-.city-item span:first-child {
-  font-weight: 600;
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-.city-item span:last-child {
-  font-size: 14px;
-  color: #666;
-}
-
-.countries-section {
-  padding: 40px 0;
-  border-top: 1px solid #eee;
-}
-.country-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-  margin-top: 30px;
-}
-.country-item {
-  font-size: 16px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-.country-item:hover {
-  text-decoration: underline;
-}
-
-/* ===== 底部 ===== */
-.footer {
-  background: #fff;
-  border-top: 1px solid #eee;
-  padding: 40px 50px 20px;
-  width: 100%;
-}
-.footer-top {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
-}
-.footer-logo {
-  font-size: 20px;
-  font-weight: 900;
-}
-.footer-apps {
-  display: flex;
-  gap: 10px;
-}
-.app-btn {
-  background: #000;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  padding: 30px 0;
-  border-top: 1px solid #eee;
-}
-.footer-col h4 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-.footer-col ul li {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #333;
-  cursor: pointer;
-}
-.footer-col ul li:hover {
-  text-decoration: underline;
-}
-
-.footer-bottom {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #666;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-.footer-bottom-social {
-  display: flex;
-  gap: 15px;
-}
-.footer-bottom-social span {
-  cursor: pointer;
-}
-
-/* ===== 响应式 ===== */
-@media (max-width: 768px) {
-  .full-width-content {
-    padding: 0 20px;
-  }
-  .footer {
-    padding: 40px 20px 20px;
-  }
-  .navbar {
-    padding: 12px 20px;
-  }
-  .hero {
-    height: 100vh;
-    padding: 40px 20px;
-  }
-  .hero-overlay {
-    max-width: 100%;
-    margin-left: 0;
-  }
-  .search-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .search-input-wrapper {
-    width: 100%;
-  }
-  .dropdown-btn,
-  .search-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  .features {
-    grid-template-columns: 1fr;
-  }
-  .city-grid,
-  .country-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+/* 设置地图标记点上的文本样式 */
+.amap-marker-label{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  color: #000 !important;
+  font-weight: bold !important;
 }
 </style>
