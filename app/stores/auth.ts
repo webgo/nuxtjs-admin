@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
     roles.value = []
     permissions.value = []
     menus.value = []
-    navigateTo('/login')
+    navigateTo('/admin/login')
   }
 
   function hasPermission(code: string) {

@@ -6,7 +6,7 @@ export default defineNuxtPlugin(() => {
           const token = useCookie('token')
           token.value = null
           ElMessage.error('登录已失效，请重新登录')
-          navigateTo('/login')
+          navigateTo('/admin/login')
         }
       },
     })

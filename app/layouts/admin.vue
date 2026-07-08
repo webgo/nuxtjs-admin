@@ -95,7 +95,7 @@ function handleCommand(command: string) {
   if (command === 'logout') {
     authStore.logout()
   } else if (command === 'profile') {
-    router.push('/profile')
+    router.push('/admin/profile')
   }
 }
 </script>

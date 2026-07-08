@@ -32,12 +32,16 @@ server/
                           category/content/file/monitor/audit-log/notification
                           online-user/cache
 app/
-  layouts/admin.vue       侧边栏+顶栏布局（含通知铃铛）
+  layouts/admin.vue       后台管理布局（侧边栏+顶栏+通知铃铛）
+  layouts/portal.vue      前端门户布局（简洁导航+页脚，无侧边栏）
   components/             RichTextEditor, NotificationBell
   composables/            useRequest(统一API), useFileUpload, useExport(Excel)
   middleware/auth.ts      客户端路由守卫
   stores/auth.ts          Pinia 认证仓库
-  pages/                  各功能页面
+  pages/
+    portal/               前端门户页面（用户端）
+      index.vue           UberEats 风格首页
+    ...                   各功能页面
 tests/                    Vitest 测试
 ```
 
@@ -111,6 +115,15 @@ await exportExcel({
 - Vitest + @nuxt/test-utils + happy-dom
 - `npm run test` / `npm run test:watch`
 
+### 10. 前端门户模块
+
+面向消费者/用户的前端门户，与后台管理分离，访客无需登录即可访问：
+
+- **Portal 布局** `app/layouts/portal.vue` — 简洁顶部导航 + 页脚，无侧边栏，无认证要求
+- **Portal 首页** `/portal` — UberEats 风格的美食外送首页，含英雄区、美食分类、餐厅推荐、订餐流程展示
+-   **路由规则**: `/**` 重定向到 `/portal`；`/admin/**` 为后台管理页面（需要登录）；`/portal/**` 使用 SSR 渲染（见 `nuxt.config.ts`）
+- **设计语言**: UberEats 风格（主色 #06C167），现代化卡片式布局，全响应式
+
 ## 认证流程
 
 1. POST `/api/auth/login` → JWT token，前端存 `useCookie('token')`，同时回写 Redis 在线记录
@@ -140,7 +153,7 @@ await exportExcel({
 
 ## 关键约定
 
-- **路由**: Nuxt 4 文件路由（`[id].put.ts` → `/:id` PUT）
+- **路由**: Nuxt 4 文件路由（`[id].put.ts` → `/:id` PUT）；后台管理页面统一挂载在 `/admin` 前缀下
 - **API 调用**: 优先使用 `useRequest()` composable，统一错误处理
 - **页面**: `definePageMeta({ layout: 'admin', middleware: 'auth' })`
 - **图标**: `<el-icon><component :is="iconName" /></el-icon>`

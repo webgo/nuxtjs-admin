@@ -19,14 +19,14 @@ async function main() {
   // 1. 创建权限/菜单
   const permissions = [
     // 顶级目录
-    { id: 1, name: '系统管理', code: 'system', type: 0, parentId: 0, path: '/system', icon: 'Setting', sort: 1, status: 1, visible: 1 },
-    { id: 2, name: '系统监控', code: 'monitor', type: 0, parentId: 0, path: '/monitor', icon: 'Monitor', sort: 2, status: 1, visible: 1 },
+    { id: 1, name: '系统管理', code: 'system', type: 0, parentId: 0, path: '/admin/system', icon: 'Setting', sort: 1, status: 1, visible: 1 },
+    { id: 2, name: '系统监控', code: 'monitor', type: 0, parentId: 0, path: '/admin/monitor', icon: 'Monitor', sort: 2, status: 1, visible: 1 },
 
     // 系统管理 -> 子菜单
-    { id: 10, name: '用户管理', code: 'system:user', type: 1, parentId: 1, path: '/system/user', icon: 'User', sort: 1, status: 1, visible: 1 },
-    { id: 11, name: '角色管理', code: 'system:role', type: 1, parentId: 1, path: '/system/role', icon: 'Avatar', sort: 2, status: 1, visible: 1 },
-    { id: 12, name: '菜单管理', code: 'system:permission', type: 1, parentId: 1, path: '/system/permission', icon: 'Menu', sort: 3, status: 1, visible: 1 },
-    { id: 13, name: '字典管理', code: 'system:dict', type: 1, parentId: 1, path: '/system/dict-type', icon: 'Notebook', sort: 4, status: 1, visible: 1 },
+    { id: 10, name: '用户管理', code: 'system:user', type: 1, parentId: 1, path: '/admin/system/user', icon: 'User', sort: 1, status: 1, visible: 1 },
+    { id: 11, name: '角色管理', code: 'system:role', type: 1, parentId: 1, path: '/admin/system/role', icon: 'Avatar', sort: 2, status: 1, visible: 1 },
+    { id: 12, name: '菜单管理', code: 'system:permission', type: 1, parentId: 1, path: '/admin/system/permission', icon: 'Menu', sort: 3, status: 1, visible: 1 },
+    { id: 13, name: '字典管理', code: 'system:dict', type: 1, parentId: 1, path: '/admin/system/dict-type', icon: 'Notebook', sort: 4, status: 1, visible: 1 },
 
     // 按钮权限
     { id: 20, name: '用户查询', code: 'system:user:list', type: 2, parentId: 10, sort: 1 },
@@ -50,15 +50,15 @@ async function main() {
     { id: 53, name: '字典删除', code: 'system:dict:delete', type: 2, parentId: 13, sort: 4 },
 
     // 文件管理
-    { id: 90, name: '文件管理', code: 'system:file', type: 1, parentId: 1, path: '/system/file', icon: 'FolderOpened', sort: 5, status: 1, visible: 1 },
+    { id: 90, name: '文件管理', code: 'system:file', type: 1, parentId: 1, path: '/admin/system/file', icon: 'FolderOpened', sort: 5, status: 1, visible: 1 },
     { id: 91, name: '文件查询', code: 'system:file:list', type: 2, parentId: 90, sort: 1 },
     { id: 92, name: '文件上传', code: 'system:file:upload', type: 2, parentId: 90, sort: 2 },
     { id: 93, name: '文件删除', code: 'system:file:delete', type: 2, parentId: 90, sort: 3 },
 
     // 内容管理
-    { id: 60, name: '内容管理', code: 'content', type: 0, parentId: 0, path: '/content', icon: 'Document', sort: 3, status: 1, visible: 1 },
-    { id: 61, name: '分类管理', code: 'content:category', type: 1, parentId: 60, path: '/content/category', icon: 'Collection', sort: 1, status: 1, visible: 1 },
-    { id: 62, name: '内容列表', code: 'content:article', type: 1, parentId: 60, path: '/content/article', icon: 'DocumentCopy', sort: 2, status: 1, visible: 1 },
+    { id: 60, name: '内容管理', code: 'content', type: 0, parentId: 0, path: '/admin/content', icon: 'Document', sort: 3, status: 1, visible: 1 },
+    { id: 61, name: '分类管理', code: 'content:category', type: 1, parentId: 60, path: '/admin/content/category', icon: 'Collection', sort: 1, status: 1, visible: 1 },
+    { id: 62, name: '内容列表', code: 'content:article', type: 1, parentId: 60, path: '/admin/content/article', icon: 'DocumentCopy', sort: 2, status: 1, visible: 1 },
 
     // 分类按钮权限
     { id: 70, name: '分类查询', code: 'content:category:list', type: 2, parentId: 61, sort: 1 },
@@ -73,26 +73,26 @@ async function main() {
     { id: 83, name: '内容删除', code: 'content:article:delete', type: 2, parentId: 62, sort: 4 },
 
     // 系统监控
-    { id: 100, name: '服务器监控', code: 'monitor:server', type: 1, parentId: 2, path: '/monitor/server', icon: 'Monitor', sort: 1, status: 1, visible: 1 },
+    { id: 100, name: '服务器监控', code: 'monitor:server', type: 1, parentId: 2, path: '/admin/monitor/server', icon: 'Monitor', sort: 1, status: 1, visible: 1 },
     { id: 101, name: '监控查询', code: 'monitor:server:list', type: 2, parentId: 100, sort: 1 },
 
     // 审计日志
-    { id: 110, name: '审计日志', code: 'system:audit-log', type: 1, parentId: 1, path: '/system/audit-log', icon: 'List', sort: 6, status: 1, visible: 1 },
+    { id: 110, name: '审计日志', code: 'system:audit-log', type: 1, parentId: 1, path: '/admin/system/audit-log', icon: 'List', sort: 6, status: 1, visible: 1 },
     { id: 111, name: '日志查询', code: 'system:audit-log:list', type: 2, parentId: 110, sort: 1 },
     { id: 112, name: '日志导出', code: 'system:audit-log:export', type: 2, parentId: 110, sort: 2 },
 
     // 通知中心
-    { id: 120, name: '通知中心', code: 'system:notification', type: 1, parentId: 1, path: '/system/notification', icon: 'BellFilled', sort: 7, status: 1, visible: 1 },
+    { id: 120, name: '通知中心', code: 'system:notification', type: 1, parentId: 1, path: '/admin/system/notification', icon: 'BellFilled', sort: 7, status: 1, visible: 1 },
     { id: 121, name: '通知查询', code: 'system:notification:list', type: 2, parentId: 120, sort: 1 },
     { id: 122, name: '通知已读', code: 'system:notification:read', type: 2, parentId: 120, sort: 2 },
 
     // 在线用户
-    { id: 130, name: '在线用户', code: 'system:online-user', type: 1, parentId: 1, path: '/system/online-user', icon: 'Avatar', sort: 8, status: 1, visible: 1 },
+    { id: 130, name: '在线用户', code: 'system:online-user', type: 1, parentId: 1, path: '/admin/system/online-user', icon: 'Avatar', sort: 8, status: 1, visible: 1 },
     { id: 131, name: '在线用户查询', code: 'system:online-user:list', type: 2, parentId: 130, sort: 1 },
     { id: 132, name: '在线用户强退', code: 'system:online-user:force-logout', type: 2, parentId: 130, sort: 2 },
 
     // 缓存监控 (系统监控下)
-    { id: 140, name: '缓存监控', code: 'monitor:cache', type: 1, parentId: 2, path: '/monitor/cache', icon: 'Coin', sort: 2, status: 1, visible: 1 },
+    { id: 140, name: '缓存监控', code: 'monitor:cache', type: 1, parentId: 2, path: '/admin/monitor/cache', icon: 'Coin', sort: 2, status: 1, visible: 1 },
     { id: 141, name: '缓存查询', code: 'monitor:cache:list', type: 2, parentId: 140, sort: 1 },
     { id: 142, name: '缓存删除', code: 'monitor:cache:delete', type: 2, parentId: 140, sort: 2 },
     { id: 143, name: '缓存清空', code: 'monitor:cache:clear', type: 2, parentId: 140, sort: 3 },

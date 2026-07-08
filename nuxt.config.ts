@@ -31,9 +31,14 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'NuxtJS Admin',
+      title: 'FoodDelivery - 美食外送',
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
     },
+  },
+
+  routeRules: {
+    '/': { redirect: '/portal' },
+    '/portal/**': { ssr: true },
   },
 })

@@ -114,7 +114,7 @@ async function handleReadAll() {
 
 function goToPage() {
   popoverRef.value?.hide()
-  router.push('/system/notification')
+  router.push('/admin/system/notification')
 }
 </script>
 
