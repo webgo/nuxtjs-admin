@@ -7,6 +7,7 @@
     "title": "近くの料理をデリバリー予約",
     "addressPlaceholder": "住所を入力",
     "delivery": "デリバリー",
+    "pickup": "受け取り",
     "search": "検索",
     "loginHint": "最近の住所を見るにはログイン"
   },

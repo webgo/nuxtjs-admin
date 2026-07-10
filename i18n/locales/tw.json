@@ -7,6 +7,7 @@
     "title": "預約附近餐點外送服務",
     "addressPlaceholder": "輸入地址",
     "delivery": "外送",
+    "pickup": "自取",
     "search": "開始搜尋",
     "loginHint": "登入以查看最近地址"
   },
