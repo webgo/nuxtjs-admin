@@ -121,7 +121,7 @@ import { Document, UploadFilled, CopyDocument } from '@element-plus/icons-vue'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const { formatFileSize } = useFileUpload()
+const { formatFileSize } = useFileHelper()
 
 const uploadVisible = ref(false)
 const uploadLoading = ref(false)

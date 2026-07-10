@@ -151,7 +151,7 @@ import type { ContentItem, CategoryItem, ApiResponse, PaginatedData } from '#sha
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const { uploadFile } = useFileUpload()
+const { uploadFile } = useFileHelper()
 
 const articleList = ref<ContentItem[]>([])
 const categories = ref<CategoryItem[]>([])

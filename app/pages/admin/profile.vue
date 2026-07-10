@@ -64,7 +64,7 @@ import { UserFilled } from '@element-plus/icons-vue'
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 const authStore = useAuthStore()
-const { uploadFile: upload } = useFileUpload()
+const { uploadFile: upload } = useFileHelper()
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const profileLoading = ref(false)
 const pwdLoading = ref(false)

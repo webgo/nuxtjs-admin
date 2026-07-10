@@ -1,6 +1,6 @@
 import type { ApiResponse, FileRecord } from '#shared/types/api'
 
-export function useFileUpload() {
+export function useFileHelper() {
   /**
    * 上传单个文件
    * @param file  File 对象（来自 <input type="file"> 或 el-upload）
