@@ -3,6 +3,9 @@ import { verifyToken, getTokenFromHeader } from '../utils/jwt'
 // 不需要认证的路由白名单
 const publicPaths = [
   '/api/auth/login',
+  '/api/eats/merchant',
+  '/api/eats/product',
+  '/api/eats/merchant-category',
 ]
 
 export default defineEventHandler(async (event) => {
