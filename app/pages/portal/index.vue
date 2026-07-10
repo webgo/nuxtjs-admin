@@ -59,10 +59,39 @@
             />
           </div>
 
-          <div
-            class="h-[55px] bg-white border border-gray-200 rounded-lg px-5 text-[15px] font-medium text-gray-700 flex items-center gap-2 cursor-pointer shadow-md shrink-0 max-md:w-full max-md:justify-center"
-          >
-            <span>🚚 {{ $t("hero.delivery") }}</span>
+          <div class="relative shrink-0 max-md:w-full order-type-dropdown">
+            <div
+              class="h-[55px] bg-white border border-gray-200 rounded-lg px-5 text-[15px] font-medium text-gray-700 flex items-center gap-2 cursor-pointer shadow-md select-none max-md:w-full max-md:justify-center"
+              @click="showOrderTypeDropdown = !showOrderTypeDropdown"
+            >
+              <span>{{ orderType === 'delivery' ? '🚚' : '📦' }} {{ orderType === 'delivery' ? $t('hero.delivery') : $t('hero.pickup') }}</span>
+              <svg
+                class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200"
+                :class="{ 'rotate-180': showOrderTypeDropdown }"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              v-if="showOrderTypeDropdown"
+              class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-md:w-full"
+            >
+              <div
+                class="px-5 py-3 text-[15px] font-medium text-gray-700 flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                :class="{ 'bg-gray-50': orderType === 'delivery' }"
+                @click="selectOrderType('delivery')"
+              >
+                <span>🚚 {{ $t('hero.delivery') }}</span>
+              </div>
+              <div
+                class="px-5 py-3 text-[15px] font-medium text-gray-700 flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                :class="{ 'bg-gray-50': orderType === 'pickup' }"
+                @click="selectOrderType('pickup')"
+              >
+                <span>📦 {{ $t('hero.pickup') }}</span>
+              </div>
+            </div>
           </div>
 
           <button
@@ -219,6 +248,13 @@ const route = useRoute();
 
 const address = ref("");
 const currentYear = ref(new Date().getFullYear());
+const orderType = ref<"delivery" | "pickup">("delivery");
+const showOrderTypeDropdown = ref(false);
+
+function selectOrderType(type: "delivery" | "pickup") {
+  orderType.value = type;
+  showOrderTypeDropdown.value = false;
+}
 
 // 高德地图
 const mapContainer = ref<HTMLDivElement>();
@@ -258,6 +294,14 @@ onMounted(async () => {
   // 等待 DOM 就绪后初始化高德地图
   await nextTick();
   await initMap();
+
+  // 点击下拉框外部时关闭
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (showOrderTypeDropdown.value && !target.closest(".order-type-dropdown")) {
+      showOrderTypeDropdown.value = false;
+    }
+  });
 });
 
 const availableLocales = computed(() => {
