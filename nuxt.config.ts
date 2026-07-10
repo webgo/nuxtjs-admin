@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@element-plus/nuxt', '@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/i18n'],
+  modules: ['@element-plus/nuxt', '@pinia/nuxt', '@nuxt/ui', '@nuxtjs/i18n'],
 
   elementPlus: {
     icon: 'ElIcon',
@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     jwtExpiresIn: '24h',
   },
 
-  css: ['element-plus/dist/index.css', '~/assets/css/global.css'],
+  css: ['element-plus/dist/index.css', '~/assets/css/global.css', '~/assets/css/main.css'],
 
   typescript: {
     strict: true,
@@ -51,5 +51,16 @@ export default defineNuxtConfig({
     ],
     strategy: 'no_prefix',
     detectBrowserLanguage: false,
+  },
+
+  fonts: {
+    providers: {
+      google: false,
+      googleicons: false,
+      adobe: false,
+      bunny: false,
+      fontshare: false,
+      fontsource: false,
+    },
   },
 })

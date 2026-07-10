@@ -11,7 +11,7 @@
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
             />
           </svg>
-          Uber Eats
+          Vber Eats
         </div>
       </div>
       <div class="flex items-center gap-5 text-sm font-semibold">
@@ -23,11 +23,6 @@
           class="bg-black text-white px-4 py-2 rounded-[20px] cursor-pointer no-underline"
           >{{ $t("nav.signup") }}</NuxtLink
         >
-        <div
-          class="bg-black text-white size-[30px] rounded-full flex items-center justify-center text-sm cursor-pointer"
-        >
-          0
-        </div>
       </div>
     </nav>
 
@@ -35,7 +30,8 @@
     <section
       class="relative min-h-[calc(100vh-64px)] flex items-center bg-cover bg-center bg-no-repeat max-md:min-h-screen max-md:px-5"
       style="
-        background-image: url(&quot;https://www.ubereats.com/_static/c413f20400e04805.webp&quot;);
+        background-image: url(&quot;/hero-banner.webp&quot;);
+        background-color: #FFD700;
       "
     >
       <div
@@ -118,10 +114,10 @@
         <article
           v-for="(card, idx) in featureCards"
           :key="idx"
-          class="bg-white rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
+          class="bg-white overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
         >
           <div
-            class="w-full aspect-[5/3] bg-cover bg-center"
+            class="w-full aspect-[2/1] bg-cover bg-center"
             :style="{ backgroundImage: `url(${card.img})` }"
           />
           <div class="p-5">
@@ -153,9 +149,14 @@
         </div>
 
         <div class="grid grid-cols-5 gap-5 max-md:grid-cols-2">
-          <div v-for="city in cities" :key="city.name" class="flex flex-col">
-            <span class="font-semibold text-base mb-0.5">{{ city.name }}</span>
-            <span class="text-sm text-gray-500">{{ city.country }}</span>
+          <div
+            v-for="city in citiesList"
+            :key="city.id"
+            class="flex flex-col cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors"
+            @click="goToCity(getRegionName(city), city.lng, city.lat)"
+          >
+            <span class="font-semibold text-base mb-0.5">{{ getRegionName(city) }}</span>
+            <span class="text-sm text-gray-500">{{ city.parentName }}</span>
           </div>
         </div>
       </section>
@@ -170,11 +171,11 @@
         </div>
         <div class="grid grid-cols-5 gap-5 mt-8 max-md:grid-cols-2">
           <div
-            v-for="country in countries"
-            :key="country"
+            v-for="country in countriesList"
+            :key="country.id"
             class="text-base mb-2 cursor-pointer hover:underline"
           >
-            {{ country }}
+            {{ getRegionName(country) }}
           </div>
         </div>
       </section>
@@ -185,7 +186,7 @@
       class="bg-white border-t border-gray-100 pt-10 px-12 pb-5 w-full max-md:px-5 max-md:pb-5 max-md:pt-10"
     >
       <div class="flex justify-between mb-8">
-        <div class="text-xl font-black">Uber Eats</div>
+        <div class="text-xl font-black">Vber Eats</div>
         <div class="flex gap-2.5">
           <span
             class="bg-black text-white px-4 py-2 rounded text-xs flex items-center gap-1.5 cursor-pointer"
@@ -246,6 +247,8 @@ definePageMeta({
 const { t, locale, locales, setLocale } = useI18n();
 const route = useRoute();
 
+import type { ApiResponse, RegionItem } from '#shared/types/api'
+
 const address = ref("");
 const currentYear = ref(new Date().getFullYear());
 const orderType = ref<"delivery" | "pickup">("delivery");
@@ -261,22 +264,46 @@ const mapContainer = ref<HTMLDivElement>();
 const mapReady = ref(false);
 let mapInstance: any = null;
 
-interface CityMarker {
-  name: string;
-  lng: number;
-  lat: number;
-}
-
-const cityMarkers: CityMarker[] = [
-  { name: "台北市", lng: 121.5654, lat: 25.033 },
-  { name: "台中市", lng: 120.6736, lat: 24.1477 },
-  { name: "台南市", lng: 120.1888, lat: 22.9984 },
-  { name: "高雄市", lng: 120.2942, lat: 22.6168 },
-  { name: "新竹市", lng: 120.9675, lat: 24.8067 },
-];
-
 type LocaleCode = "tw" | "en" | "jp";
 const VALID_LOCALES: LocaleCode[] = ["tw", "en", "jp"];
+
+// Region data from API
+const countriesList = ref<any[]>([])
+const citiesList = ref<any[]>([])
+const currentCountry = ref<any>(null)
+
+function getRegionName(region: any): string {
+  if (!region) return ''
+  if (locale.value === 'en') return region.nameEn || region.name
+  if (locale.value === 'jp') return region.nameJp || region.name
+  return region.name
+}
+
+async function loadRegions() {
+  const localeMap: Record<string, string> = { tw: 'tw', en: 'en', jp: 'jp' }
+  const currentLang = localeMap[locale.value] || 'tw'
+
+  const [countriesRes, allCountriesRes] = await Promise.all([
+    $fetch<ApiResponse<RegionItem[]>>('/api/system/region/options', { params: { level: 1, lang: currentLang, status: 1 } }),
+    $fetch<ApiResponse<RegionItem[]>>('/api/system/region/options', { params: { level: 1, status: 1 } }),
+  ])
+  countriesList.value = allCountriesRes.data
+
+  if (countriesRes.data?.length) {
+    currentCountry.value = countriesRes.data[0]
+    const citiesRes = await $fetch<ApiResponse<RegionItem[]>>('/api/system/region/options', { params: { parentId: currentCountry.value?.id, status: 1 } })
+    if (citiesRes.data?.[0]?.level === 2) {
+      const allCities: any[] = []
+      for (const province of citiesRes.data) {
+        const res = await $fetch<ApiResponse<RegionItem[]>>('/api/system/region/options', { params: { parentId: province.id, status: 1 } })
+        allCities.push(...res.data.map((c) => ({ ...c, parentName: getRegionName(province) })))
+      }
+      citiesList.value = allCities
+    } else if (citiesRes.data?.length) {
+      citiesList.value = citiesRes.data.map((c) => ({ ...c, parentName: getRegionName(currentCountry.value) }))
+    }
+  }
+}
 
 // 从 URL 路径读取语言并设置（首次加载 / 刷新时）
 onMounted(async () => {
@@ -287,12 +314,13 @@ onMounted(async () => {
     VALID_LOCALES.includes(localeParam as LocaleCode)
   ) {
     if (localeParam !== locale.value) {
-      setLocale(localeParam as LocaleCode);
+      await setLocale(localeParam as LocaleCode);
     }
   }
 
-  // 等待 DOM 就绪后初始化高德地图
+  // 等待 DOM 就绪后加载区域数据并初始化高德地图
   await nextTick();
+  await loadRegions();
   await initMap();
 
   // 点击下拉框外部时关闭
@@ -315,62 +343,21 @@ const featureCards = computed(() => {
   void locale.value;
   return [
     {
-      img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=600",
+      img: "/feature-reward.webp",
       title: t("features.card1.title"),
       subtitle: t("features.card1.subtitle"),
     },
     {
-      img: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=600",
+      img: "/feature-partner.webp",
       title: t("features.card2.title"),
       subtitle: t("features.card2.subtitle"),
     },
     {
-      img: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=600",
+      img: "/feature-deliver.webp",
       title: t("features.card3.title"),
       subtitle: t("features.card3.subtitle"),
     },
   ];
-});
-
-// 城市列表
-const cityKeys = [
-  "taichung",
-  "tainan",
-  "taipei",
-  "kaohsiung",
-  "hsinchu",
-] as const;
-
-const cities = computed(() => {
-  void locale.value;
-  return cityKeys.map((key) => ({
-    name: t(`cities.${key}`),
-    country: t("cities.country"),
-  }));
-});
-
-// 国家/地区列表
-const countryKeys = [
-  "us",
-  "ca",
-  "uk",
-  "fr",
-  "de",
-  "jp",
-  "kr",
-  "au",
-  "nz",
-  "sg",
-  "my",
-  "th",
-  "mx",
-  "br",
-  "ar",
-] as const;
-
-const countries = computed(() => {
-  void locale.value;
-  return countryKeys.map((key) => t(`countries.${key}`));
 });
 
 // 底部栏目
@@ -421,10 +408,14 @@ async function initMap() {
     version: "1.4.15",
   });
 
+  const center = currentCountry.value?.lng
+    ? [Number(currentCountry.value.lng), Number(currentCountry.value.lat)]
+    : [120.7, 23.7]
+
   mapInstance = new AMap.Map(mapContainer.value, {
     features: ["bg", "building", "point"],
-    center: [120.7, 23.7],
-    zoom: 7,
+    center,
+    zoom: 8,
     zoomEnable: false,
     dragEnable: false,
     scrollWheel: false,
@@ -438,16 +429,20 @@ async function initMap() {
 
   const markers: any[] = [];
 
-  cityMarkers.forEach((city) => {
+  citiesList.value.forEach((city: any) => {
     const marker = new AMap.Marker({
-      position: [city.lng, city.lat],
+      position: [Number(city.lng), Number(city.lat)],
       content: `<div style="width:10px;height:10px;background:#000;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>`,
       offset: new AMap.Pixel(-5, -5),
       label: {
-        content: `<div class="amap-marker-my">${city.name}</div>`,
+        content: `<div class="amap-marker-my">${getRegionName(city)}</div>`,
         direction: "top",
         offset: new AMap.Pixel(0, -6),
       },
+    });
+    marker.on('click', () => {
+      const prefix = locale.value === 'tw' ? '' : `/${locale.value}`
+      navigateTo(`/portal${prefix}/channel?city=${encodeURIComponent(getRegionName(city))}&lng=${city.lng}&lat=${city.lat}`)
     });
     mapInstance!.add(marker);
     markers.push(marker);
@@ -461,9 +456,22 @@ async function switchLanguage(code: string) {
   await setLocale(code as LocaleCode);
 }
 
+function getLocalePrefix() {
+  return locale.value === 'tw' ? '' : `/${locale.value}`
+}
+
+async function goToCity(cityName: string, lng?: number, lat?: number) {
+  const prefix = getLocalePrefix()
+  const params = new URLSearchParams({ city: cityName })
+  if (lng !== undefined) params.set('lng', String(lng))
+  if (lat !== undefined) params.set('lat', String(lat))
+  await navigateTo(`/portal${prefix}/channel?${params.toString()}`)
+}
+
 function handleSearch() {
   if (address.value.trim()) {
-    console.log("Searching:", address.value);
+    const prefix = getLocalePrefix()
+    navigateTo(`/portal${prefix}/channel?address=${encodeURIComponent(address.value.trim())}&deliveryType=${orderType.value}`)
   }
 }
 
@@ -473,6 +481,12 @@ function handleLogin() {
 </script>
 
 <style>
+/* 隐藏高德地图 logo 和版权信息 */
+.amap-logo,
+.amap-copyright {
+  display: none !important;
+}
+
 /* 设置地图标记点上的文本样式 */
 .amap-marker-label{
   background: transparent !important;

@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --color-vbereats-green: #06C167;
+  --color-vbereats-dark: #000000;
+  --color-vbereats-gray: #666666;
+  --color-vbereats-light: #f2f2f2;
+}

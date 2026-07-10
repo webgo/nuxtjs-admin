@@ -2,7 +2,7 @@
 
 Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手架，用于快速搭建业务模块。
 
-> **文档维护规则**: 每次新增/修改功能后，同步更新 `.env.example`、本文件和 `shared/types/api.ts`。
+> **文档维护规则**: 每次新增/修改功能后，同步更新 `.env.example`、本文件和 `shared/types/api.ts`，并运行 `npx nuxi typecheck` 确认无类型错误。
 
 ## Tech Stack
 
@@ -167,6 +167,7 @@ await exportExcel({
 - **Portal 样式**: Portal 模块所有页面统一使用 Tailwind CSS utility classes，禁止编写自定义 CSS（不使用 `<style scoped>`）
 - **i18n 国际化**: Portal 模块使用 `@nuxtjs/i18n`，翻译文件位于 `i18n/locales/`，目前支持 `tw` / `en` / `jp` 三种语言。URL 格式为 `/portal/tw`、`/portal/en`、`/portal/jp`。
 - **文档同步**: 每次新增功能后更新 `.env.example`、`AGENTS.md`、`shared/types/api.ts`
+- **类型检查**: 任何修改完成后，必须运行 `npm run typecheck`（或 `npx nuxi typecheck`）确保无新增类型错误
 
 ## 开发命令
 
@@ -176,6 +177,7 @@ npm run build     # 构建
 npm run seed      # 种子数据
 npm run test      # 测试
 npx prisma migrate dev --name xxx   # 数据库迁移
+npx nuxi typecheck   # 类型检查（修改完成后必须运行）
 ```
 
 ## 默认管理员

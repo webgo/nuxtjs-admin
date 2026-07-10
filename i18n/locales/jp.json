@@ -14,7 +14,7 @@
   "features": {
     "card1": { "title": "美味しい食事でチームを表彰", "subtitle": "ビジネスアカウントを作成" },
     "card2": { "title": "レストランの配達をサポート", "subtitle": "パートナーになる" },
-    "card3": { "title": "Uber Eats で配達する", "subtitle": "配達パートナーとして参加" }
+    "card3": { "title": "Vber Eats で配達する", "subtitle": "配達パートナーとして参加" }
   },
   "cities": {
     "title": "近くの都市",
@@ -28,7 +28,7 @@
     "country": "台湾"
   },
   "countries": {
-    "title": "Uber Eats を利用できる国・地域",
+    "title": "Vber Eats を利用できる国・地域",
     "viewAll": "すべての地域を見る",
     "us": "アメリカ",
     "ca": "カナダ",
@@ -49,16 +49,54 @@
   "footer": {
     "appStore": "App Store",
     "googlePlay": "Google Play",
-    "col1": { "title": "Uber Eats について", "link1": "プレスリリース", "link2": "ブログ", "link3": "配達パートナーとして参加" },
+    "col1": { "title": "Vber Eats について", "link1": "プレスリリース", "link2": "ブログ", "link3": "配達パートナーとして参加" },
     "col2": { "title": "探索", "link1": "すべての都市を見る", "link2": "すべての国・地域を見る", "link3": "すべてのレストランを見る" },
     "col3": { "title": "プライバシーと利用規約", "link1": "プライバシーポリシー", "link2": "利用規約", "link3": "Cookie ポリシー" },
     "col4": { "title": "ヘルプとサポート", "link1": "よくある質問", "link2": "お問い合わせ", "link3": "日本語" },
-    "legal": "プライバシー · 利用規約 · サイト利用 · このページについて · © {year} Uber Technologies Inc."
+    "legal": "プライバシー · 利用規約 · サイト利用 · このページについて · © {year} Vber Technologies Inc."
   },
   "languageSwitcher": {
     "label": "言語",
     "zh-TW": "中文",
     "en": "English",
     "ja": "日本語"
+  },
+  "channel": {
+    "title": "近くのグルメ",
+    "searchPlaceholder": "レストランや料理を検索",
+    "nearbyMerchants": "近くの店舗",
+    "noMerchants": "近くに店舗がありません",
+    "allCategories": "すべて",
+    "deliveryFee": "配達料",
+    "minOrder": "最低注文",
+    "estimatedTime": "推定時間",
+    "minutes": "分",
+    "free": "無料",
+    "monthlySales": "月間販売",
+    "rating": "評価"
+  },
+  "merchant": {
+    "addToCart": "カートに追加",
+    "specSelection": "仕様を選択",
+    "cart": "カート",
+    "cartEmpty": "カートは空です",
+    "total": "合計",
+    "checkout": "レジに進む",
+    "loginRequired": "ログインしてください",
+    "itemAdded": "カートに追加しました",
+    "quantity": "数量",
+    "products": "商品",
+    "ratings": "評価",
+    "deliveryFee": "配達料",
+    "minOrder": "最低注文",
+    "estimatedTime": "推定時間",
+    "minutes": "分",
+    "free": "無料",
+    "openUntil": "営業終了",
+    "closed": "営業終了",
+    "monthlySales": "月間販売",
+    "selectSpec": "仕様を選択してください",
+    "confirm": "確認",
+    "cancel": "キャンセル"
   }
 }

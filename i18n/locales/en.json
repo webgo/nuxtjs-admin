@@ -14,7 +14,7 @@
   "features": {
     "card1": { "title": "Reward your team with food", "subtitle": "Create a business account" },
     "card2": { "title": "Help restaurants deliver", "subtitle": "Partner with us" },
-    "card3": { "title": "Deliver with Uber Eats", "subtitle": "Join as a delivery partner" }
+    "card3": { "title": "Deliver with Vber Eats", "subtitle": "Join as a delivery partner" }
   },
   "cities": {
     "title": "Nearby cities",
@@ -28,7 +28,7 @@
     "country": "Taiwan"
   },
   "countries": {
-    "title": "Countries with Uber Eats",
+    "title": "Countries with Vber Eats",
     "viewAll": "View all regions",
     "us": "United States",
     "ca": "Canada",
@@ -53,12 +53,50 @@
     "col2": { "title": "Explore", "link1": "View all cities", "link2": "View all countries", "link3": "View all restaurants" },
     "col3": { "title": "Privacy & Terms", "link1": "Privacy Policy", "link2": "Terms of Service", "link3": "Cookie Policy" },
     "col4": { "title": "Help & Support", "link1": "FAQ", "link2": "Contact Us", "link3": "English" },
-    "legal": "Privacy · Terms · Site Usage · About This Page · © {year} Uber Technologies Inc."
+    "legal": "Privacy · Terms · Site Usage · About This Page · © {year} Vber Technologies Inc."
   },
   "languageSwitcher": {
     "label": "Language",
     "zh-TW": "中文",
     "en": "English",
     "ja": "日本語"
+  },
+  "channel": {
+    "title": "Food Near You",
+    "searchPlaceholder": "Search restaurants or food",
+    "nearbyMerchants": "Nearby Merchants",
+    "noMerchants": "No merchants nearby",
+    "allCategories": "All",
+    "deliveryFee": "Delivery fee",
+    "minOrder": "Min. order",
+    "estimatedTime": "Estimated time",
+    "minutes": "min",
+    "free": "Free",
+    "monthlySales": "Monthly sales",
+    "rating": "Rating"
+  },
+  "merchant": {
+    "addToCart": "Add to Cart",
+    "specSelection": "Select Spec",
+    "cart": "Cart",
+    "cartEmpty": "Your cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "loginRequired": "Please log in first",
+    "itemAdded": "Added to cart",
+    "quantity": "Qty",
+    "products": "Products",
+    "ratings": "Ratings",
+    "deliveryFee": "Delivery fee",
+    "minOrder": "Min. order",
+    "estimatedTime": "Estimated time",
+    "minutes": "min",
+    "free": "Free",
+    "openUntil": "Open until",
+    "closed": "Closed",
+    "monthlySales": "Monthly sales",
+    "selectSpec": "Please select a spec",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   }
 }
