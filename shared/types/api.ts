@@ -246,3 +246,330 @@ export interface ContentItem {
   status: number
   createTime: string
 }
+
+// ========== Eats 模块 ==========
+
+// --- 商家分类 ---
+export interface MerchantCategoryItem {
+  id: number
+  name: string
+  code: string
+  icon?: string
+  sort: number
+  status: number
+}
+
+export interface MerchantCategoryQuery {
+  page?: number
+  pageSize?: number
+  name?: string
+  status?: number
+}
+
+export interface MerchantCategoryCreateBody {
+  name: string
+  code: string
+  icon?: string
+  sort?: number
+}
+
+// --- 商家 ---
+export interface MerchantItem {
+  id: number
+  name: string
+  code: string
+  description?: string
+  logo?: string
+  coverImage?: string
+  categoryId: number
+  categoryName?: string
+  regionId?: number
+  regionName?: string
+  contactName?: string
+  contactPhone?: string
+  address?: string
+  longitude?: number
+  latitude?: number
+  status: number
+  level: number
+  tags?: string
+  deliveryFee?: number
+  minOrderAmount?: number
+  estimatedDeliveryTime?: number
+  openTime?: string
+  closeTime?: string
+  rating?: number
+  ratingCount?: number
+  monthlySales?: number
+  isFeatured: number
+  isNew: number
+  remark?: string
+  createTime: string
+}
+
+export interface MerchantDetail extends MerchantItem {
+  categories: ProductCategoryItem[]
+  products: ProductItem[]
+}
+
+// ========== 地区管理 ==========
+export type RegionLevel = 1 | 2 | 3
+
+export interface RegionItem {
+  id: number
+  name: string
+  nameTw?: string
+  nameEn?: string
+  nameJp?: string
+  level: RegionLevel
+  parentId?: number
+  lang: string
+  lng?: number
+  lat?: number
+  sort: number
+  status: number
+  remark?: string
+  children: RegionItem[]
+  createTime: string
+}
+
+export interface RegionQuery {
+  page?: number
+  pageSize?: number
+  name?: string
+  level?: number
+  parentId?: number
+  lang?: string
+  status?: number
+}
+
+export interface RegionCreateBody {
+  name: string
+  nameTw?: string
+  nameEn?: string
+  nameJp?: string
+  level: RegionLevel
+  parentId?: number
+  lang: string
+  lng?: number
+  lat?: number
+  sort?: number
+  status?: number
+  remark?: string
+}
+
+// ========== 商家（带地区） ==========
+export interface MerchantQuery {
+  page?: number
+  pageSize?: number
+  name?: string
+  categoryId?: number
+  regionId?: number
+  status?: number
+  level?: number
+  isFeatured?: number
+  keyword?: string
+  longitude?: number
+  latitude?: number
+  deliveryType?: string
+}
+
+export interface MerchantCreateBody {
+  name: string
+  code: string
+  description?: string
+  logo?: string
+  coverImage?: string
+  categoryId: number
+  regionId?: number
+  contactName?: string
+  contactPhone?: string
+  address?: string
+  longitude?: number
+  latitude?: number
+  status?: number
+  level?: number
+  tags?: string
+  deliveryFee?: number
+  minOrderAmount?: number
+  estimatedDeliveryTime?: number
+  openTime?: string
+  closeTime?: string
+  isFeatured?: number
+  isNew?: number
+  remark?: string
+}
+
+// --- 商品分类 ---
+export interface ProductCategoryItem {
+  id: number
+  name: string
+  merchantId: number
+  merchantName?: string
+  sort: number
+  status: number
+  remark?: string
+}
+
+export interface ProductCategoryQuery {
+  page?: number
+  pageSize?: number
+  merchantId?: number
+  name?: string
+  status?: number
+}
+
+// --- 价格单位 ---
+export interface PriceUnitItem {
+  id: number
+  name: string
+  symbol: string
+  sort: number
+  status: number
+}
+
+// --- 商品规格 ---
+export interface ProductSpecItem {
+  id: number
+  productId: number
+  name: string
+  price: number
+  originalPrice?: number
+  unitId?: number
+  unitName?: string
+  unitSymbol?: string
+  isDefault: number
+  stock?: number
+  sort: number
+  status: number
+}
+
+// --- 商品 ---
+export interface ProductItem {
+  id: number
+  name: string
+  code: string
+  description?: string
+  image?: string
+  categoryId?: number
+  categoryName?: string
+  merchantId: number
+  merchantName?: string
+  status: number
+  sales: number
+  unit?: string
+  isRecommended: number
+  sort: number
+  remark?: string
+  specs: ProductSpecItem[]
+  priceRange?: string
+  createTime: string
+}
+
+export interface ProductQuery {
+  page?: number
+  pageSize?: number
+  merchantId?: number
+  categoryId?: number
+  name?: string
+  status?: number
+  isRecommended?: number
+}
+
+export interface ProductCreateBody {
+  name: string
+  code: string
+  description?: string
+  image?: string
+  categoryId?: number
+  merchantId: number
+  status?: number
+  unit?: string
+  isRecommended?: number
+  sort?: number
+  remark?: string
+  specs: Omit<ProductSpecItem, 'id' | 'productId' | 'createTime' | 'updateTime'>[]
+}
+
+// --- 订单 ---
+export interface OrderItem {
+  id: number
+  orderNo: string
+  merchantId: number
+  merchantName?: string
+  userId: number
+  totalAmount: number
+  deliveryFee?: number
+  serviceFee?: number
+  deliveryType?: string
+  status: string
+  deliveryAddress?: string
+  contactName?: string
+  contactPhone?: string
+  remark?: string
+  paymentMethod?: string
+  paymentTime?: string
+  items: OrderDetailItem[]
+  createTime: string
+}
+
+export interface OrderDetailItem {
+  id: number
+  productId: number
+  productName: string
+  productImage?: string
+  specName?: string
+  price: number
+  quantity: number
+  subtotal: number
+}
+
+export interface OrderQuery {
+  page?: number
+  pageSize?: number
+  merchantId?: number
+  userId?: number
+  status?: string
+  orderNo?: string
+  deliveryType?: string
+}
+
+// --- 购物车 ---
+export interface CartItem {
+  id: number
+  userId: number
+  merchantId: number
+  merchantName?: string
+  productId: number
+  productName?: string
+  productImage?: string
+  specName?: string
+  price?: number
+  unitName?: string
+  unitSymbol?: string
+  quantity: number
+  createTime: string
+}
+
+// --- 评价 ---
+export interface RatingItem {
+  id: number
+  orderId: number
+  userId: number
+  username?: string
+  merchantId: number
+  productId?: number
+  productName?: string
+  rating: number
+  content?: string
+  images?: string
+  createTime: string
+}
+
+export interface RatingQuery {
+  page?: number
+  pageSize?: number
+  merchantId?: number
+  productId?: number
+  rating?: number
+}

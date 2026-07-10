@@ -220,3 +220,249 @@ model SysNotification {
 
   @@map("sys_notification")
 }
+
+// ========== 地区管理（国家-省份-城市三级） ==========
+model SysRegion {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(100)
+  nameTw     String?     @db.VarChar(100)  // 中文名称
+  nameEn     String?     @db.VarChar(100)  // 英文名称
+  nameJp     String?     @db.VarChar(100)  // 日文名称
+  level      Int         // 1=国家/地区, 2=省份/州, 3=城市
+  parentId   Int?        @map("parent_id")
+  parent     SysRegion?  @relation("RegionHierarchy", fields: [parentId], references: [id])
+  children   SysRegion[] @relation("RegionHierarchy")
+  lang       String      @default("tw") @db.VarChar(5)  // 关联语言包: tw|en|jp
+  lng        Float?      // 经度（城市）或地图中心经度（国家）
+  lat        Float?      // 纬度（城市）或地图中心纬度（国家）
+  sort       Int         @default(0)
+  status     Int         @default(1)  // 0=禁用, 1=启用
+  remark     String?     @db.VarChar(500)
+  createTime DateTime    @default(now()) @map("create_time")
+  updateTime DateTime    @updatedAt @map("update_time")
+
+  merchants SysMerchant[]
+
+  @@map("sys_region")
+}
+
+// ========== Eats 商家分类（菜系） ==========
+model SysMerchantCategory {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(50)
+  code       String    @unique @db.VarChar(50)
+  icon       String?   @db.VarChar(255)
+  sort       Int       @default(0)
+  status     Int       @default(1)
+  remark     String?   @db.VarChar(500)
+  createTime DateTime  @default(now()) @map("create_time")
+  updateTime DateTime  @updatedAt @map("update_time")
+
+  merchants SysMerchant[]
+
+  @@map("sys_merchant_category")
+}
+
+// ========== Eats 商家 ==========
+model SysMerchant {
+  id                    Int       @id @default(autoincrement())
+  name                  String    @db.VarChar(100)
+  code                  String    @unique @db.VarChar(50)
+  description           String?   @db.Text
+  logo                  String?   @db.VarChar(500)
+  coverImage            String?   @map("cover_image") @db.VarChar(500)
+  categoryId            Int       @map("category_id")
+  regionId              Int?      @map("region_id")
+  contactName           String?   @map("contact_name") @db.VarChar(50)
+  contactPhone          String?   @map("contact_phone") @db.VarChar(20)
+  address               String?   @db.VarChar(255)
+  longitude             Decimal?  @db.Decimal(10, 7)
+  latitude              Decimal?  @db.Decimal(10, 7)
+  status                Int       @default(1)  // 0=休业 1=营业 2=暂停
+  level                 Int       @default(0)  // 0=普通 1=精选 2=品牌
+  tags                  String?   @db.Text     // JSON 标签 code 数组
+  deliveryFee           Decimal?  @map("delivery_fee") @db.Decimal(10, 2)
+  minOrderAmount        Decimal?  @map("min_order_amount") @db.Decimal(10, 2)
+  estimatedDeliveryTime Int?      @map("estimated_delivery_time")
+  openTime              String?   @map("open_time") @db.VarChar(10)
+  closeTime             String?   @map("close_time") @db.VarChar(10)
+  rating                Decimal?  @db.Decimal(2, 1)
+  ratingCount           Int?      @map("rating_count")
+  monthlySales          Int?      @map("monthly_sales")
+  isFeatured            Int       @default(0) @map("is_featured")
+  isNew                 Int       @default(0) @map("is_new")
+  remark                String?   @db.VarChar(500)
+  createTime            DateTime  @default(now()) @map("create_time")
+  updateTime            DateTime  @updatedAt @map("update_time")
+
+  category         SysMerchantCategory @relation(fields: [categoryId], references: [id])
+  region           SysRegion?          @relation(fields: [regionId], references: [id])
+  productCategories SysProductCategory[]
+  products         SysProduct[]
+  orders           SysOrder[]
+  ratings          SysRating[]
+  cartItems        SysCart[]
+
+  @@map("sys_merchant")
+}
+
+// ========== Eats 商品分类（商家内部） ==========
+model SysProductCategory {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(50)
+  merchantId Int       @map("merchant_id")
+  sort       Int       @default(0)
+  status     Int       @default(1)
+  remark     String?   @db.VarChar(500)
+  createTime DateTime  @default(now()) @map("create_time")
+  updateTime DateTime  @updatedAt @map("update_time")
+
+  merchant SysMerchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  products SysProduct[]
+
+  @@map("sys_product_category")
+}
+
+// ========== Eats 商品 ==========
+model SysProduct {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(100)
+  code         String    @unique @db.VarChar(50)
+  description  String?   @db.Text
+  image        String?   @db.VarChar(500)
+  categoryId   Int?      @map("category_id")
+  merchantId   Int       @map("merchant_id")
+  status       Int       @default(1)  // 0=下架 1=上架
+  sales        Int       @default(0)
+  unit         String?   @db.VarChar(10)
+  isRecommended Int      @default(0) @map("is_recommended")
+  sort         Int       @default(0)
+  remark       String?   @db.VarChar(500)
+  createTime   DateTime  @default(now()) @map("create_time")
+  updateTime   DateTime  @updatedAt @map("update_time")
+
+  category   SysProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  merchant   SysMerchant         @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  specs      SysProductSpec[]
+  orderItems SysOrderItem[]
+  ratings    SysRating[]
+  cartItems  SysCart[]
+
+  @@map("sys_product")
+}
+
+// ========== 价格单位 ==========
+model SysPriceUnit {
+  id         Int             @id @default(autoincrement())
+  name       String          @db.VarChar(50)
+  symbol     String          @db.VarChar(10)
+  sort       Int             @default(0)
+  status     Int             @default(1)
+  remark     String?         @db.VarChar(500)
+  createTime DateTime        @default(now()) @map("create_time")
+  updateTime DateTime        @updatedAt @map("update_time")
+
+  specs SysProductSpec[]
+
+  @@map("sys_price_unit")
+}
+
+// ========== Eats 商品规格（独立定价） ==========
+model SysProductSpec {
+  id            Int          @id @default(autoincrement())
+  productId     Int          @map("product_id")
+  name          String       @db.VarChar(50)
+  price         Decimal      @db.Decimal(10, 2)
+  originalPrice Decimal?     @map("original_price") @db.Decimal(10, 2)
+  unitId        Int?         @map("unit_id")
+  isDefault     Int          @default(0) @map("is_default")
+  stock         Int?         @default(0)
+  sort          Int          @default(0)
+  status        Int          @default(1)
+  createTime    DateTime     @default(now()) @map("create_time")
+  updateTime    DateTime     @updatedAt @map("update_time")
+
+  product SysProduct  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unit    SysPriceUnit? @relation(fields: [unitId], references: [id])
+
+  @@map("sys_product_spec")
+}
+
+// ========== Eats 订单 ==========
+model SysOrder {
+  id               Int       @id @default(autoincrement())
+  orderNo          String    @unique @map("order_no") @db.VarChar(30)
+  merchantId       Int       @map("merchant_id")
+  userId           Int       @map("user_id")
+  totalAmount      Decimal   @map("total_amount") @db.Decimal(10, 2)
+  deliveryFee      Decimal?  @map("delivery_fee") @db.Decimal(10, 2)
+  serviceFee       Decimal?  @map("service_fee") @db.Decimal(10, 2)
+  deliveryType     String?   @map("delivery_type") @db.VarChar(10) // delivery/pickup
+  status           String    @default("pending") @db.VarChar(20)
+  deliveryAddress  String?   @map("delivery_address") @db.VarChar(255)
+  contactName      String?   @map("contact_name") @db.VarChar(50)
+  contactPhone     String?   @map("contact_phone") @db.VarChar(20)
+  remark           String?   @db.VarChar(500)
+  paymentMethod    String?   @map("payment_method") @db.VarChar(20)
+  paymentTime      DateTime? @map("payment_time")
+  createTime       DateTime  @default(now()) @map("create_time")
+  updateTime       DateTime  @updatedAt @map("update_time")
+
+  merchant SysMerchant  @relation(fields: [merchantId], references: [id])
+  items    SysOrderItem[]
+
+  @@map("sys_order")
+}
+
+// ========== Eats 订单明细 ==========
+model SysOrderItem {
+  id           Int     @id @default(autoincrement())
+  orderId      Int     @map("order_id")
+  productId    Int     @map("product_id")
+  productName  String  @map("product_name") @db.VarChar(100)
+  productImage String? @map("product_image") @db.VarChar(500)
+  specName     String? @map("spec_name") @db.VarChar(50)
+  price        Decimal @db.Decimal(10, 2)
+  quantity     Int
+  subtotal     Decimal @db.Decimal(10, 2)
+
+  order   SysOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product SysProduct @relation(fields: [productId], references: [id])
+
+  @@map("sys_order_item")
+}
+
+// ========== Eats 评价 ==========
+model SysRating {
+  id         Int      @id @default(autoincrement())
+  orderId    Int      @unique @map("order_id")
+  userId     Int      @map("user_id")
+  merchantId Int      @map("merchant_id")
+  productId  Int?     @map("product_id")
+  rating     Int      // 1-5
+  content    String?  @db.Text
+  images     String?  @db.Text  // JSON 图片 URL 数组
+  createTime DateTime @default(now()) @map("create_time")
+
+  merchant SysMerchant @relation(fields: [merchantId], references: [id])
+  product  SysProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@map("sys_rating")
+}
+
+// ========== Eats 购物车 ==========
+model SysCart {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  merchantId Int      @map("merchant_id")
+  productId  Int      @map("product_id")
+  specName   String?  @map("spec_name") @db.VarChar(50)
+  quantity   Int      @default(1)
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+
+  merchant SysMerchant @relation(fields: [merchantId], references: [id])
+  product  SysProduct  @relation(fields: [productId], references: [id])
+
+  @@map("sys_cart")
+}
