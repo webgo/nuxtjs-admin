@@ -108,7 +108,7 @@ const filters = reactive({
   status: undefined as number | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<CategoryItem>>>('/api/system/category', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<CategoryItem>>>('/api/admin/category', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const categoryList = computed(() => data.value?.data?.list ?? [])
@@ -150,10 +150,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/category/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/category/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/category', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/category', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -167,7 +167,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除分类"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/category/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/category/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

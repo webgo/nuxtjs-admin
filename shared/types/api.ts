@@ -21,6 +21,7 @@ export interface UserInfo {
   phone: string | null
   avatar: string | null
   status: number
+  userType: number // 0=普通用户, 1=管理员
 }
 
 export interface UserItem extends UserInfo {
@@ -114,7 +115,25 @@ export interface LoginBody {
   password: string
 }
 
+export interface PortalLoginBody {
+  email: string
+  password: string
+}
+
+export interface PortalRegisterBody {
+  username: string
+  email: string
+  password: string
+  nickname?: string
+  phone?: string
+}
+
 export interface LoginResult {
+  token: string
+  user: UserInfo
+}
+
+export interface PortalLoginResult {
   token: string
   user: UserInfo
 }
@@ -572,4 +591,31 @@ export interface RatingQuery {
   merchantId?: number
   productId?: number
   rating?: number
+}
+
+// ========== 用户地址 ==========
+export interface UserAddressItem {
+  id: number
+  userId: number
+  label: string | null
+  name: string
+  phone: string
+  province: string | null
+  city: string | null
+  district: string | null
+  detail: string
+  isDefault: number
+  createTime: string
+  updateTime: string
+}
+
+export interface UserAddressCreateBody {
+  label?: string
+  name: string
+  phone: string
+  province?: string
+  city?: string
+  district?: string
+  detail: string
+  isDefault?: number
 }

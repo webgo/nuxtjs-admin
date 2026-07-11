@@ -41,6 +41,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="用户类型" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.userType === 1 ? 'danger' : 'info'" size="small">
+              {{ row.userType === 1 ? '管理员' : '普通用户' }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
             <el-tag :type="getDictTagType(statusDict, row.status)" size="small">
@@ -104,6 +111,12 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="用户类型">
+          <el-radio-group v-model="form.userType">
+            <el-radio :value="0">普通用户</el-radio>
+            <el-radio :value="1">管理员</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="form.remark" type="textarea" />
         </el-form-item>
@@ -133,7 +146,7 @@ const filters = reactive({
   status: undefined as number | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<UserItem>>>('/api/system/user', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<UserItem>>>('/api/admin/user', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const userList = computed(() => data.value?.data?.list ?? [])
@@ -153,6 +166,7 @@ const form = reactive({
   phone: '',
   roleIds: [] as number[],
   status: 1,
+  userType: 0,
   remark: '',
 })
 
@@ -172,7 +186,7 @@ watch(isEdit, (v) => {
 })
 
 async function loadRoles() {
-  const res: any = await $fetch('/api/system/role/all')
+  const res: any = await $fetch('/api/admin/role/all')
   roleOptions.value = res.data
 }
 
@@ -196,6 +210,7 @@ function handleAdd() {
   form.phone = ''
   form.roleIds = []
   form.status = 1
+  form.userType = 0
   form.remark = ''
   dialogVisible.value = true
 }
@@ -210,6 +225,7 @@ async function handleEdit(row: UserItem) {
   form.phone = row.phone || ''
   form.roleIds = row.roles.map((r: any) => r.id)
   form.status = row.status
+  form.userType = row.userType ?? 0
   form.remark = row.remark || ''
   dialogVisible.value = true
 }
@@ -221,13 +237,13 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/user/${form.id}`, {
+      await $fetch(`/api/admin/user/${form.id}`, {
         method: 'PUT',
         body: { ...form, id: undefined },
       })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/user', {
+      await $fetch('/api/admin/user', {
         method: 'POST',
         body: { ...form, id: undefined },
       })
@@ -244,7 +260,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: UserItem) {
   await ElMessageBox.confirm(`确定删除用户"${row.username}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/user/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/user/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

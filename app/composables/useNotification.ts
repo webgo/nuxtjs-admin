@@ -7,7 +7,7 @@ let pollingTimer: ReturnType<typeof setInterval> | null = null
 export function useNotification() {
   async function refreshUnreadCount() {
     try {
-      const res = await $fetch<{ code: number; data: number }>('/api/system/notification/unread-count')
+      const res = await $fetch<{ code: number; data: number }>('/api/admin/notification/unread-count')
       unreadCount.value = res.data
     } catch {
       // API 不可用时静默失败
@@ -17,8 +17,8 @@ export function useNotification() {
   async function fetchNotifications() {
     try {
       const [listRes, countRes] = await Promise.all([
-        $fetch<{ code: number; data: { list: NotificationItem[] } }>('/api/system/notification?pageSize=5'),
-        $fetch<{ code: number; data: number }>('/api/system/notification/unread-count'),
+        $fetch<{ code: number; data: { list: NotificationItem[] } }>('/api/admin/notification?pageSize=5'),
+        $fetch<{ code: number; data: number }>('/api/admin/notification/unread-count'),
       ])
       unreadCount.value = countRes.data
       return listRes.data.list

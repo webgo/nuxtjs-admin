@@ -198,7 +198,7 @@ function formatBytes(bytes: number | undefined | null): string {
 
 async function fetchData() {
   try {
-    const res = await $fetch<ApiResponse<SystemMonitorData>>('/api/system/monitor')
+    const res = await $fetch<ApiResponse<SystemMonitorData>>('/api/admin/monitor')
     data.value = res.data
   } catch (err: any) {
     ElMessage.error(err.data?.message || '获取监控数据失败')

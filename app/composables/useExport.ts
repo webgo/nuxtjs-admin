@@ -28,7 +28,7 @@ export interface ExportOptions<T = Record<string, unknown>> {
  *     { key: 'username', title: '用户名', width: 20 },
  *     { key: 'status', title: '状态', formatter: v => v === 1 ? '启用' : '禁用' },
  *   ],
- *   fetchData: () => $fetch('/api/system/user?pageSize=9999'),
+ *   fetchData: () => $fetch('/api/admin/user?pageSize=9999'),
  *   fileName: '用户数据.xlsx',
  * })
  * ```

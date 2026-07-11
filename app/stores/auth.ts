@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import type { UserInfo, MenuNode, UserinfoResult, LoginResult } from '#shared/types/api'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = useCookie('token', { maxAge: 60 * 60 * 24 })
+  const token = useCookie('admin_token', { maxAge: 60 * 60 * 24 })
   const user = ref<UserInfo | null>(null)
   const roles = ref<string[]>([])
   const permissions = ref<string[]>([])
@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => !!token.value)
 
   async function login(username: string, password: string) {
-    const res = await $fetch<{ code: number; data: LoginResult }>('/api/auth/login', {
+    const res = await $fetch<{ code: number; data: LoginResult }>('/api/admin/auth/login', {
       method: 'POST',
       body: { username, password },
     })
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchUserInfo() {
     try {
-      const res = await $fetch<{ code: number; data: UserinfoResult }>('/api/auth/userinfo')
+      const res = await $fetch<{ code: number; data: UserinfoResult }>('/api/admin/auth/userinfo')
       user.value = res.data.user
       roles.value = res.data.roles
       permissions.value = res.data.permissions
@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function fetchMenus() {
     try {
-      const res = await $fetch<{ code: number; data: MenuNode[] }>('/api/auth/menus')
+      const res = await $fetch<{ code: number; data: MenuNode[] }>('/api/admin/auth/menus')
       menus.value = res.data
       return res.data
     } catch {

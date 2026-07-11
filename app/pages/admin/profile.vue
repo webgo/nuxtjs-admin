@@ -92,7 +92,7 @@ async function handleAvatarChange(e: Event) {
 
   try {
     const record = await upload(file, { module: 'avatar' })
-    await $fetch('/api/auth/profile', {
+    await $fetch('/api/admin/auth/profile', {
       method: 'PUT',
       body: { avatar: record.filePath },
     })
@@ -109,7 +109,7 @@ async function handleAvatarChange(e: Event) {
 async function saveProfile() {
   profileLoading.value = true
   try {
-    const res = await ($fetch('/api/auth/profile', {
+    const res = await ($fetch('/api/admin/auth/profile', {
       method: 'PUT',
       body: {
         nickname: profileForm.nickname || null,
@@ -144,7 +144,7 @@ async function changePassword() {
   }
   pwdLoading.value = true
   try {
-    const res = await ($fetch('/api/auth/change-password', {
+    const res = await ($fetch('/api/admin/auth/change-password', {
       method: 'PUT',
       body: { oldPassword: pwdForm.oldPassword, newPassword: pwdForm.newPassword },
     }) as unknown as { code: number; msg?: string })

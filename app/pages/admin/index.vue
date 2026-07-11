@@ -37,10 +37,10 @@ const stats = ref<StatItem[]>([
 onMounted(async () => {
   try {
     const [userRes, roleRes, permRes, dictRes] = await Promise.all([
-      $fetch<ApiResponse<{ total: number }>>('/api/system/user?page=1&pageSize=1'),
-      $fetch<ApiResponse<{ total: number }>>('/api/system/role?page=1&pageSize=1'),
-      $fetch<ApiResponse<unknown[]>>('/api/system/permission'),
-      $fetch<ApiResponse<{ total: number }>>('/api/system/dict-type?page=1&pageSize=1'),
+      $fetch<ApiResponse<{ total: number }>>('/api/admin/user?page=1&pageSize=1'),
+      $fetch<ApiResponse<{ total: number }>>('/api/admin/role?page=1&pageSize=1'),
+      $fetch<ApiResponse<unknown[]>>('/api/admin/permission'),
+      $fetch<ApiResponse<{ total: number }>>('/api/admin/dict-type?page=1&pageSize=1'),
     ])
     stats.value = [
       { label: '用户数', value: userRes.data.total },

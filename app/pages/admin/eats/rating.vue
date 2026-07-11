@@ -62,7 +62,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ merchantId: undefined as number | undefined, rating: undefined as number | undefined })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<RatingItem>>>('/api/eats/rating', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<RatingItem>>>('/api/rating', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -72,7 +72,7 @@ const total = computed(() => data.value?.data?.total ?? 0)
 async function loadMerchants(query?: string) {
   merchantLoading.value = true
   try {
-    const res: any = await $fetch('/api/eats/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
+    const res: any = await $fetch('/api/admin/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
     merchantOptions.value = res.data.list
   } finally {
     merchantLoading.value = false
@@ -88,7 +88,7 @@ function handleReset() { filters.merchantId = undefined; filters.rating = undefi
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm('确定删除该评价？', '提示', { type: 'warning' })
-  await $fetch(`/api/eats/rating/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/rating/${row.id}`, { method: 'DELETE' } as any)
   ElMessage.success('删除成功')
   refresh()
 }

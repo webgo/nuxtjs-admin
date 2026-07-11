@@ -136,7 +136,7 @@ const filters = reactive({
   fileType: '',
 })
 
-const { data, status, refresh } = useLazyFetch('/api/system/file', {
+const { data, status, refresh } = useLazyFetch('/api/admin/file', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const fileList = computed(() => (data.value as any)?.data?.list ?? [])
@@ -172,7 +172,7 @@ async function handleUpload() {
     for (const f of pendingFiles.value) {
       formData.append('files', f.raw)
     }
-    await $fetch('/api/system/file/upload', { method: 'POST', body: formData })
+    await $fetch('/api/admin/file/upload', { method: 'POST', body: formData })
     ElMessage.success(`成功上传 ${pendingFiles.value.length} 个文件`)
     uploadVisible.value = false
     pendingFiles.value = []
@@ -191,7 +191,7 @@ function handleDownload(row: any) {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除文件"${row.fileName}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/file/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/file/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

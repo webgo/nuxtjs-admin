@@ -1,20 +1,7 @@
 <template>
   <div class="font-sans bg-white text-black w-full min-h-screen">
-    <!-- 导航栏（同 index.vue 保持一致） -->
-    <nav class="flex justify-between items-center px-10 py-4 bg-white h-16 sticky top-0 z-[100] max-md:px-5 max-md:py-3">
-      <div class="flex items-center gap-[15px]">
-        <NuxtLink to="/portal" class="font-black text-xl tracking-tight flex items-center no-underline text-black">
-          <svg class="w-5 h-5 mr-[5px]" viewBox="0 0 24 24" fill="black">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-          </svg>
-          Vber Eats
-        </NuxtLink>
-      </div>
-      <div class="flex items-center gap-5 text-sm font-semibold">
-        <NuxtLink to="/admin/login" class="no-underline cursor-pointer">{{ $t("nav.login") }}</NuxtLink>
-        <NuxtLink to="/admin/login" class="bg-black text-white px-4 py-2 rounded-[20px] cursor-pointer no-underline">{{ $t("nav.signup") }}</NuxtLink>
-      </div>
-    </nav>
+    <!-- 导航栏 -->
+    <PortalNavbar />
 
     <!-- 搜索横幅 -->
     <section class="bg-gradient-to-r from-gray-50 to-white px-10 py-8 max-md:px-5 max-md:py-6">
@@ -230,7 +217,7 @@ onMounted(async () => {
 
 async function loadCategories() {
   try {
-    const res = await $fetch<ApiResponse<MerchantCategoryItem[]>>('/api/eats/merchant-category/all')
+    const res = await $fetch<ApiResponse<MerchantCategoryItem[]>>('/api/portal/merchant-category/')
     if (res.code === 200) {
       categories.value = res.data
     }
@@ -257,7 +244,7 @@ async function loadMerchants() {
       params.longitude = Number(route.query.lng)
       params.latitude = Number(route.query.lat)
     }
-    const res = await $fetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/eats/merchant', { params })
+    const res = await $fetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/portal/merchant/', { params })
     if (res.code === 200) {
       merchants.value = res.data.list
       total.value = res.data.total
@@ -287,7 +274,7 @@ async function loadMore() {
       params.longitude = Number(route.query.lng)
       params.latitude = Number(route.query.lat)
     }
-    const res = await $fetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/eats/merchant', { params })
+    const res = await $fetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/portal/merchant/', { params })
     if (res.code === 200) {
       merchants.value.push(...res.data.list)
       total.value = res.data.total

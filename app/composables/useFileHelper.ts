@@ -16,7 +16,7 @@ export function useFileHelper() {
       }
     }
 
-    const res = await $fetch<ApiResponse<FileRecord>>('/api/system/file/upload', {
+    const res = await $fetch<ApiResponse<FileRecord>>('/api/admin/file/upload', {
       method: 'POST',
       body: formData,
     })
@@ -36,7 +36,7 @@ export function useFileHelper() {
         formData.append(key, String(value))
       }
     }
-    const res = await $fetch<ApiResponse<FileRecord[]>>('/api/system/file/upload', {
+    const res = await $fetch<ApiResponse<FileRecord[]>>('/api/admin/file/upload', {
       method: 'POST',
       body: formData,
     })

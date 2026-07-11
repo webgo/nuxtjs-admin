@@ -194,7 +194,7 @@ const filters = reactive({
   status: undefined as number | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<DictTypeItem>>>('/api/system/dict-type', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<DictTypeItem>>>('/api/admin/dict-type', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const dictList = computed(() => data.value?.data?.list ?? [])
@@ -250,10 +250,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/dict-type/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/dict-type/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/dict-type', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/dict-type', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -267,7 +267,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: DictTypeItem) {
   await ElMessageBox.confirm(`确定删除字典"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/dict-type/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/dict-type/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }
@@ -278,7 +278,7 @@ async function handleDictData(row: DictTypeItem) {
   dataDialogVisible.value = true
   dataLoading.value = true
   try {
-    const res = await $fetch('/api/system/dict-data', { params: { dictTypeId: row.id, pageSize: 100 } }) as unknown as ApiResponse<PaginatedData<DictDataItem>>
+    const res = await $fetch('/api/admin/dict-data', { params: { dictTypeId: row.id, pageSize: 100 } }) as unknown as ApiResponse<PaginatedData<DictDataItem>>
     dictDataList.value = res.data.list
   } finally {
     dataLoading.value = false
@@ -310,15 +310,15 @@ async function handleDataSubmit() {
   dataSubmitLoading.value = true
   try {
     if (isDataEdit.value) {
-      await $fetch(`/api/system/dict-data/${dataForm.id}`, { method: 'PUT', body: { ...dataForm } })
+      await $fetch(`/api/admin/dict-data/${dataForm.id}`, { method: 'PUT', body: { ...dataForm } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/dict-data', { method: 'POST', body: { ...dataForm } })
+      await $fetch('/api/admin/dict-data', { method: 'POST', body: { ...dataForm } })
       ElMessage.success('创建成功')
     }
     dataFormVisible.value = false
     // 刷新数据列表
-    const res = await $fetch<ApiResponse<PaginatedData<DictDataItem>>>('/api/system/dict-data', { params: { dictTypeId: currentDictId.value, pageSize: 100 } })
+    const res = await $fetch<ApiResponse<PaginatedData<DictDataItem>>>('/api/admin/dict-data', { params: { dictTypeId: currentDictId.value, pageSize: 100 } })
     dictDataList.value = res.data.list
   } catch (err: any) {
     ElMessage.error(err.data?.message || '操作失败')
@@ -329,9 +329,9 @@ async function handleDataSubmit() {
 
 async function handleDataDelete(row: DictDataItem) {
   await ElMessageBox.confirm(`确定删除字典数据"${row.label}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/dict-data/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/dict-data/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
-  const res = await $fetch<ApiResponse<PaginatedData<DictDataItem>>>('/api/system/dict-data', { params: { dictTypeId: currentDictId.value, pageSize: 100 } })
+  const res = await $fetch<ApiResponse<PaginatedData<DictDataItem>>>('/api/admin/dict-data', { params: { dictTypeId: currentDictId.value, pageSize: 100 } })
   dictDataList.value = res.data.list
 }
 

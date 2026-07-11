@@ -229,7 +229,7 @@ async function fetchTree() {
     if (filters.level) query.level = filters.level
     if (filters.lang) query.lang = filters.lang
     if (filters.status != null) query.status = filters.status
-    const res = await $fetch<{ code: number; data: { list: RegionItem[] } }>('/api/system/region', { params: { tree: true, ...query } })
+    const res = await $fetch<{ code: number; data: { list: RegionItem[] } }>('/api/admin/region', { params: { tree: true, ...query } })
     regionTree.value = res.data.list ?? []
   } catch {
     regionTree.value = []
@@ -331,10 +331,10 @@ async function handleSubmit() {
   try {
     const body = { ...form, lang: langList.value.join(','), parentId: form.level === 1 ? null : form.parentId }
     if (isEdit.value) {
-      await $fetch(`/api/system/region/${form.id}`, { method: 'PUT', body })
+      await $fetch(`/api/admin/region/${form.id}`, { method: 'PUT', body })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/region', { method: 'POST', body })
+      await $fetch('/api/admin/region', { method: 'POST', body })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -348,7 +348,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除地区"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/region/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/region/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   fetchTree()
 }

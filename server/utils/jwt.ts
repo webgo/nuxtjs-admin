@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 interface JwtPayload {
   userId: number;
   username: string;
+  userType: number;
 }
 
 const getSecret = () => {
@@ -31,10 +32,18 @@ export function getTokenFromHeader(event: any): string | null {
   if (authHeader && authHeader.startsWith("Bearer ")) {
     return authHeader.substring(7);
   }
-  // 降级：从 cookie 读取
-  const cookieToken = getCookie(event, "token");
-  if (cookieToken) {
-    return cookieToken;
+  // 根据请求路径决定读取哪个 cookie
+  const path = getRequestURL(event).pathname || '';
+  if (path.startsWith('/api/portal/')) {
+    const portalToken = getCookie(event, "portal_token");
+    if (portalToken) return portalToken;
+    const adminToken = getCookie(event, "admin_token");
+    if (adminToken) return adminToken;
+  } else {
+    const adminToken = getCookie(event, "admin_token");
+    if (adminToken) return adminToken;
+    const portalToken = getCookie(event, "portal_token");
+    if (portalToken) return portalToken;
   }
   return null;
 }

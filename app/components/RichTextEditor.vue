@@ -80,7 +80,7 @@ function imageHandler() {
     try {
       const formData = new FormData()
       formData.append('files', file)
-      const res: any = await $fetch('/api/system/file/upload', {
+      const res: any = await $fetch('/api/admin/file/upload', {
         method: 'POST',
         body: formData,
       })

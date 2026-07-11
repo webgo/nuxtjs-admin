@@ -43,7 +43,7 @@ export function useDict() {
       return cached.data
     }
 
-    const res = await $fetch<{ code: number; data: { list: DictDataItem[] } }>('/api/system/dict-data', {
+    const res = await $fetch<{ code: number; data: { list: DictDataItem[] } }>('/api/admin/dict-data', {
       params: { dictCode, pageSize: 999 },
     })
 

@@ -87,7 +87,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ merchantId: undefined as number | undefined, name: '' })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<ProductCategoryItem>>>('/api/eats/product-category', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<ProductCategoryItem>>>('/api/admin/product-category', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -104,7 +104,7 @@ const rules = {
 async function loadMerchants(query?: string) {
   merchantLoading.value = true
   try {
-    const res: any = await $fetch('/api/eats/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
+    const res: any = await $fetch('/api/admin/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
     merchantOptions.value = res.data.list
     // 自动选中第一个商家，避免页面加载无数据
     if (res.data.list?.length && filters.merchantId === undefined) {
@@ -140,10 +140,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/eats/product-category/${form.id}`, { method: 'PUT', body: { name: form.name, sort: form.sort } })
+      await $fetch(`/api/admin/product-category/${form.id}`, { method: 'PUT', body: { name: form.name, sort: form.sort } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/eats/product-category', { method: 'POST', body: { ...form, id: undefined } })
+      await $fetch('/api/admin/product-category', { method: 'POST', body: { ...form, id: undefined } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -157,7 +157,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除分类"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/eats/product-category/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/product-category/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

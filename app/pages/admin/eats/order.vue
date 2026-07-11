@@ -116,7 +116,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ orderNo: '', merchantId: undefined as number | undefined, status: '' })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<OrderItem>>>('/api/eats/order', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<OrderItem>>>('/api/order', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -135,7 +135,7 @@ function statusType(s: string) {
 async function loadMerchants(query?: string) {
   merchantLoading.value = true
   try {
-    const res: any = await $fetch('/api/eats/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
+    const res: any = await $fetch('/api/admin/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
     merchantOptions.value = res.data.list
   } finally {
     merchantLoading.value = false
@@ -150,14 +150,14 @@ function handleSearch() { page.value = 1 }
 function handleReset() { filters.orderNo = ''; filters.merchantId = undefined; filters.status = ''; page.value = 1 }
 
 async function handleDetail(row: any) {
-  const res: any = await $fetch(`/api/eats/order/${row.id}`)
+  const res: any = await $fetch(`/api/order/${row.id}`)
   detail.value = res.data
   detailVisible.value = true
 }
 
 async function handleStatus(row: any, newStatus: string) {
   await ElMessageBox.confirm(`确定将订单"${row.orderNo}"状态变更为"${statusLabel(newStatus)}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/eats/order/${row.id}/status`, { method: 'PUT', body: { status: newStatus } })
+  await $fetch(`/api/order/${row.id}/status`, { method: 'PUT', body: { status: newStatus } })
   ElMessage.success('状态更新成功')
   refresh()
 }

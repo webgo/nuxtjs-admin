@@ -209,7 +209,7 @@ function formatTtl(seconds: number): string {
 // 获取缓存概览
 async function fetchInfo() {
   try {
-    const res = await $fetch<ApiResponse<CacheInfoData & { available?: boolean }>>('/api/system/cache')
+    const res = await $fetch<ApiResponse<CacheInfoData & { available?: boolean }>>('/api/admin/cache')
     if (res.data && res.data.available !== false) {
       info.value = res.data as CacheInfoData
     }
@@ -227,7 +227,7 @@ async function handleSearchKeys() {
 async function loadKeys() {
   keysLoading.value = true
   try {
-    const res = await $fetch<ApiResponse<{ list: CacheKeyItem[]; total: number; page: number; pageSize: number }>>('/api/system/cache/keys', {
+    const res = await $fetch<ApiResponse<{ list: CacheKeyItem[]; total: number; page: number; pageSize: number }>>('/api/admin/cache/keys', {
       params: {
         pattern: keyPattern.value,
         page: keyPage.value,
@@ -246,7 +246,7 @@ async function loadKeys() {
 // 查看 Key 详情
 async function handleViewKey(row: CacheKeyItem) {
   try {
-    const res = await $fetch<ApiResponse<{ key: string; type: string; ttl: number; value: string }>>(`/api/system/cache/${encodeURIComponent(row.key)}`)
+    const res = await $fetch<ApiResponse<{ key: string; type: string; ttl: number; value: string }>>(`/api/admin/cache/${encodeURIComponent(row.key)}`)
     detailData.value = res.data
     detailVisible.value = true
   } catch (err: any) {
@@ -262,7 +262,7 @@ async function handleDeleteKey(row: CacheKeyItem) {
       cancelButtonText: '取消',
       type: 'warning',
     })
-    await $fetch(`/api/system/cache/${encodeURIComponent(row.key)}`, { method: 'DELETE' })
+    await $fetch(`/api/admin/cache/${encodeURIComponent(row.key)}`, { method: 'DELETE' })
     ElMessage.success('删除成功')
     loadKeys()
   } catch {
@@ -279,7 +279,7 @@ async function handleClearAll() {
       type: 'error',
       confirmButtonClass: 'el-button--danger',
     })
-    await $fetch('/api/system/cache/clear', { method: 'DELETE' })
+    await $fetch('/api/admin/cache/clear', { method: 'DELETE' })
     ElMessage.success('缓存已全部清空')
     fetchInfo()
     loadKeys()

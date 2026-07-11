@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `sys_user` ADD COLUMN `userType` INTEGER NOT NULL DEFAULT 0;

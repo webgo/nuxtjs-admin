@@ -1,22 +1,12 @@
 <template>
   <div class="font-sans bg-white text-black w-full min-h-screen">
     <!-- 导航栏 -->
-    <nav class="flex justify-between items-center px-10 py-4 bg-white h-16 sticky top-0 z-[100] max-md:px-5 max-md:py-3">
-      <div class="flex items-center gap-[15px]">
-        <NuxtLink to="/portal" class="font-black text-xl tracking-tight flex items-center no-underline text-black">
-          <svg class="w-5 h-5 mr-[5px]" viewBox="0 0 24 24" fill="black">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-          </svg>
-          Vber Eats
-        </NuxtLink>
+    <PortalNavbar>
+      <template #breadcrumb>
         <span class="text-gray-300 mx-1">/</span>
         <span class="text-sm text-gray-500 truncate max-w-[200px]">{{ merchant?.name }}</span>
-      </div>
-      <div class="flex items-center gap-5 text-sm font-semibold">
-        <NuxtLink to="/admin/login" class="no-underline cursor-pointer">{{ $t("nav.login") }}</NuxtLink>
-        <NuxtLink to="/admin/login" class="bg-black text-white px-4 py-2 rounded-[20px] cursor-pointer no-underline">{{ $t("nav.signup") }}</NuxtLink>
-      </div>
-    </nav>
+      </template>
+    </PortalNavbar>
 
     <!-- 加载状态 -->
     <template v-if="loading">
@@ -336,7 +326,7 @@ function scrollToCategory(categoryId: number) {
 
 // 检查登录状态
 function checkAuth() {
-  const token = useCookie('token')
+  const token = useCookie('portal_token')
   isLoggedIn.value = !!token.value
 }
 
@@ -346,7 +336,7 @@ const toast = useToast()
 function handleAddProduct(product: ProductItem) {
   if (!isLoggedIn.value) {
     toast.add({ title: t('merchant.loginRequired'), color: 'warning' })
-    router.push('/admin/login')
+    router.push('/portal/login')
     return
   }
 
@@ -374,7 +364,7 @@ async function confirmAddToCart() {
 
 async function addToCart(product: ProductItem, spec: ProductSpecItem) {
   try {
-    const res = await $fetch<ApiResponse<unknown>>('/api/eats/cart', {
+    const res = await $fetch<ApiResponse<unknown>>('/api/cart/', {
       method: 'POST',
       body: {
         merchantId: product.merchantId,
@@ -396,7 +386,7 @@ async function updateCartQuantity(item: CartItem, newQty: number) {
   if (newQty <= 0) {
     // 数量为0 → 删除
     try {
-      const res = await $fetch<ApiResponse<unknown>>(`/api/eats/cart/${item.id}`, { method: 'DELETE' })
+      const res = await $fetch<ApiResponse<unknown>>(`/api/cart/${item.id}`, { method: 'DELETE' })
       if (res.code === 200) {
         await loadCart()
       }
@@ -405,7 +395,7 @@ async function updateCartQuantity(item: CartItem, newQty: number) {
     }
   } else {
     try {
-      const res = await $fetch<ApiResponse<unknown>>(`/api/eats/cart/${item.id}`, {
+      const res = await $fetch<ApiResponse<unknown>>(`/api/cart/${item.id}`, {
         method: 'PUT',
         body: { quantity: newQty },
       })
@@ -421,7 +411,7 @@ async function updateCartQuantity(item: CartItem, newQty: number) {
 async function loadCart() {
   if (!isLoggedIn.value) return
   try {
-    const res = await $fetch<ApiResponse<Array<{ merchantId: number; merchantName: string; items: CartItem[] }>>>('/api/eats/cart')
+    const res = await $fetch<ApiResponse<Array<{ merchantId: number; merchantName: string; items: CartItem[] }>>>('/api/cart/')
     if (res.code === 200 && Array.isArray(res.data)) {
       cartItems.value = res.data.flatMap(g => g.items ?? [])
     } else {
@@ -450,7 +440,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await $fetch<ApiResponse<MerchantDetail>>(`/api/eats/merchant/${id}`)
+    const res = await $fetch<ApiResponse<MerchantDetail>>(`/api/portal/merchant/${id}`)
     if (res.code === 200) {
       merchant.value = res.data
       if (res.data.categories.length > 0) {

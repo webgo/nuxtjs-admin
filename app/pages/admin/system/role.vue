@@ -136,7 +136,7 @@ const filters = reactive({
   status: undefined as number | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<RoleItem>>>('/api/system/role', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<RoleItem>>>('/api/admin/role', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const roleList = computed(() => data.value?.data?.list ?? [])
@@ -181,10 +181,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/role/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/role/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/role', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/role', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -198,7 +198,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: RoleItem) {
   await ElMessageBox.confirm(`确定删除角色"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/role/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/role/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }
@@ -206,11 +206,11 @@ async function handleDelete(row: RoleItem) {
 async function handlePermission(row: RoleItem) {
   currentRoleId.value = row.id
   // 加载权限树
-  const res = await $fetch<ApiResponse<PermissionNode[]>>('/api/system/permission')
+  const res = await $fetch<ApiResponse<PermissionNode[]>>('/api/admin/permission')
   permTree.value = res.data
 
   // 加载已有权限
-  const permRes = await $fetch<ApiResponse<number[]>>(`/api/system/role/${row.id}/permissions`)
+  const permRes = await $fetch<ApiResponse<number[]>>(`/api/admin/role/${row.id}/permissions`)
   nextTick(() => {
     treeRef.value?.setCheckedKeys(permRes.data)
   })
@@ -224,7 +224,7 @@ async function handleSavePermission() {
     const checkedKeys = treeRef.value.getCheckedKeys()
     const halfCheckedKeys = treeRef.value.getHalfCheckedKeys()
     const permissionIds = [...checkedKeys, ...halfCheckedKeys]
-    await $fetch(`/api/system/role/${currentRoleId.value}`, {
+    await $fetch(`/api/admin/role/${currentRoleId.value}`, {
       method: 'PUT',
       body: { permissionIds },
     })

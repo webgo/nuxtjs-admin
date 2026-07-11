@@ -190,7 +190,7 @@ const rules = {
 
 async function fetchCategories() {
   try {
-    const res = await $fetch<ApiResponse<PaginatedData<CategoryItem>>>('/api/system/category/all')
+    const res = await $fetch<ApiResponse<PaginatedData<CategoryItem>>>('/api/admin/category/all')
     categories.value = res.data.list
   } catch {
     // ignore
@@ -200,7 +200,7 @@ async function fetchCategories() {
 async function fetchData() {
   loading.value = true
   try {
-    const res = await $fetch<ApiResponse<PaginatedData<ContentItem>>>('/api/system/content', { params: query })
+    const res = await $fetch<ApiResponse<PaginatedData<ContentItem>>>('/api/admin/content', { params: query })
     articleList.value = res.data.list
     total.value = res.data.total
   } finally {
@@ -273,10 +273,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/content/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/content/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/content', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/content', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -290,7 +290,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除内容"${row.title}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/content/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/content/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   fetchData()
 }

@@ -1,18 +1,24 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>
 
 <script setup lang="ts">
-const token = useCookie('token')
+const adminToken = useCookie('admin_token')
+const portalToken = useCookie('portal_token')
 
-// 只在客户端初始化 auth 状态（SSR 时 $fetch 不会自动转发 cookie）
 onMounted(async () => {
-  if (token.value) {
+  if (adminToken.value) {
     const authStore = useAuthStore()
     await authStore.fetchUserInfo()
     await authStore.fetchMenus()
+  }
+  if (portalToken.value) {
+    const portalAuth = usePortalAuthStore()
+    await portalAuth.fetchUserInfo()
   }
 })
 </script>

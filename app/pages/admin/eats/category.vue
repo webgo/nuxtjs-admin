@@ -88,7 +88,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ name: '', status: undefined as number | undefined })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<MerchantCategoryItem>>>('/api/eats/merchant-category', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<MerchantCategoryItem>>>('/api/admin/merchant-category', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -123,10 +123,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/eats/merchant-category/${form.id}`, { method: 'PUT', body: { ...form, id: undefined } })
+      await $fetch(`/api/admin/merchant-category/${form.id}`, { method: 'PUT', body: { ...form, id: undefined } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/eats/merchant-category', { method: 'POST', body: { ...form, id: undefined } })
+      await $fetch('/api/admin/merchant-category', { method: 'POST', body: { ...form, id: undefined } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -140,7 +140,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除分类"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/eats/merchant-category/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/merchant-category/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

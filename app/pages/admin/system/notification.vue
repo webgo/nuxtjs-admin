@@ -70,7 +70,7 @@ const query = computed(() => {
   if (activeTab.value === 'unread') q.isRead = 0
   return q
 })
-const { data, status, refresh } = useLazyFetch('/api/system/notification', {
+const { data, status, refresh } = useLazyFetch('/api/admin/notification', {
   query,
 })
 const list = computed(() => (data.value as any)?.data?.list ?? [])
@@ -105,14 +105,14 @@ function handleTabChange() {
 
 async function handleRead(item: NotificationItem) {
   if (item.isRead === 0) {
-    await $fetch(`/api/system/notification/${item.id}/read`, { method: 'PUT' })
+    await $fetch(`/api/admin/notification/${item.id}/read`, { method: 'PUT' })
     item.isRead = 1
     refreshUnreadCount()
   }
 }
 
 async function handleReadAll() {
-  await $fetch('/api/system/notification/read-all', { method: 'PUT' })
+  await $fetch('/api/admin/notification/read-all', { method: 'PUT' })
   refreshUnreadCount()
   refresh()
 }

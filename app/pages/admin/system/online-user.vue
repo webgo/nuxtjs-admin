@@ -77,7 +77,7 @@ const q = computed(() => {
   if (keyword.value) params.username = keyword.value
   return params
 })
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<OnlineUserItem>>>('/api/system/online-user', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<OnlineUserItem>>>('/api/admin/online-user', {
   query: q,
 })
 const list = computed(() => data.value?.data?.list ?? [])
@@ -99,7 +99,7 @@ async function handleForceLogout(row: OnlineUserItem) {
       cancelButtonText: '取消',
       type: 'warning',
     })
-    await $fetch(`/api/system/online-user/${row.userId}`, { method: 'DELETE' })
+    await $fetch(`/api/admin/online-user/${row.userId}`, { method: 'DELETE' })
     ElMessage.success('强制下线成功')
     refresh()
   } catch {

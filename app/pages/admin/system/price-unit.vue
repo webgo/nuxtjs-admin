@@ -112,7 +112,7 @@ const filters = reactive({
   status: undefined as number | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<PriceUnitRow>>>('/api/system/price-unit', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<PriceUnitRow>>>('/api/admin/price-unit', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -154,10 +154,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/price-unit/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/price-unit/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/price-unit', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/price-unit', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -171,7 +171,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: PriceUnitRow) {
   await ElMessageBox.confirm(`确定删除单位"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/price-unit/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/price-unit/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

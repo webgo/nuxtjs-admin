@@ -25,7 +25,7 @@ interface RequestConfig extends UseRequestOptions {
  * @example
  * ```ts
  * const { get, post, loading } = useRequest()
- * const data = await get<UserItem[]>('/api/system/user', { params: { page: 1 } })
+ * const data = await get<UserItem[]>('/api/admin/user', { params: { page: 1 } })
  * ```
  */
 export function useRequest() {

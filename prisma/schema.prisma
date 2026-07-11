@@ -16,12 +16,14 @@ model SysUser {
   phone      String?   @db.VarChar(20)
   avatar     String?   @db.VarChar(255)
   status     Int       @default(1) // 0=禁用, 1=启用
+  userType   Int       @default(0) // 0=普通用户, 1=管理员
   remark     String?   @db.VarChar(500)
   createTime DateTime  @default(now()) @map("create_time")
   updateTime DateTime  @updatedAt @map("update_time")
 
-  roles SysUserRole[]
-  menus SysUserMenu[]
+  roles   SysUserRole[]
+  menus   SysUserMenu[]
+  addresses SysUserAddress[]
 
   @@map("sys_user")
 }
@@ -465,4 +467,25 @@ model SysCart {
   product  SysProduct  @relation(fields: [productId], references: [id])
 
   @@map("sys_cart")
+}
+
+// ========== 用户配送地址 ==========
+model SysUserAddress {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  label      String?  @db.VarChar(20)
+  name       String   @db.VarChar(50)
+  phone      String   @db.VarChar(20)
+  province   String?  @db.VarChar(50)
+  city       String?  @db.VarChar(50)
+  district   String?  @db.VarChar(50)
+  detail     String   @db.VarChar(255)
+  isDefault  Int      @default(0) @map("is_default")
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+
+  user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sys_user_address")
 }

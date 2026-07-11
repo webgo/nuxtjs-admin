@@ -156,7 +156,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ merchantId: undefined as number | undefined, name: '', status: undefined as number | undefined })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<ProductItem>>>('/api/eats/product', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<ProductItem>>>('/api/admin/product', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -181,7 +181,7 @@ function removeSpec(idx: number) { form.specs.splice(idx, 1) }
 async function loadMerchants(query?: string) {
   merchantLoading.value = true
   try {
-    const res: any = await $fetch('/api/eats/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
+    const res: any = await $fetch('/api/admin/merchant', { params: { page: 1, pageSize: 20, name: query || undefined } })
     merchantOptions.value = res.data.list
   } finally {
     merchantLoading.value = false
@@ -196,7 +196,7 @@ async function loadProductCategories(merchantId: number, query?: string) {
   if (!merchantId) { productCategoryOptions.value = []; return }
   productCategoryLoading.value = true
   try {
-    const res: any = await $fetch('/api/eats/product-category', { params: { page: 1, pageSize: 20, merchantId, name: query || undefined } })
+    const res: any = await $fetch('/api/admin/product-category', { params: { page: 1, pageSize: 20, merchantId, name: query || undefined } })
     productCategoryOptions.value = res.data.list
   } finally {
     productCategoryLoading.value = false
@@ -225,7 +225,7 @@ function handleAdd() {
 
 async function handleEdit(row: any) {
   isEdit.value = true
-  const res: any = await $fetch(`/api/eats/product/${row.id}`)
+  const res: any = await $fetch(`/api/admin/product/${row.id}`)
   const p = res.data
   form.id = p.id; form.name = p.name; form.code = p.code; form.description = p.description || ''
   form.merchantId = p.merchantId; form.categoryId = p.categoryId; form.unit = p.unit || ''
@@ -242,10 +242,10 @@ async function handleSubmit() {
   try {
     const body = { ...form, id: undefined }
     if (isEdit.value) {
-      await $fetch(`/api/eats/product/${form.id}`, { method: 'PUT', body })
+      await $fetch(`/api/admin/product/${form.id}`, { method: 'PUT', body })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/eats/product', { method: 'POST', body })
+      await $fetch('/api/admin/product', { method: 'POST', body })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -259,14 +259,14 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除商品"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/eats/product/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/product/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }
 
 async function loadPriceUnits() {
   try {
-    const res: any = await $fetch('/api/system/price-unit/all')
+    const res: any = await $fetch('/api/admin/price-unit/all')
     if (res.code === 200) priceUnitOptions.value = res.data ?? []
   } catch { /* silent */ }
 }

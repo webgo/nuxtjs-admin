@@ -97,7 +97,7 @@ const filters = reactive({
   target: undefined as string | undefined,
 })
 
-const { data, status, refresh } = useLazyFetch('/api/system/audit-log', {
+const { data, status, refresh } = useLazyFetch('/api/admin/audit-log', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const list = computed(() => (data.value as any)?.data?.list ?? [])

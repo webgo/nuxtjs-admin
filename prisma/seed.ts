@@ -168,8 +168,8 @@ async function main() {
   // 3. 创建用户
   const user = await prisma.sysUser.upsert({
     where: { username: 'admin' },
-    update: { password: hashedPassword, nickname: '系统管理员', email: 'admin@example.com', status: 1 },
-    create: { username: 'admin', password: hashedPassword, nickname: '系统管理员', email: 'admin@example.com', status: 1 },
+    update: { password: hashedPassword, nickname: '系统管理员', email: 'admin@example.com', status: 1, userType: 1 },
+    create: { username: 'admin', password: hashedPassword, nickname: '系统管理员', email: 'admin@example.com', status: 1, userType: 1 },
   })
 
   // 4. 关联用户-角色

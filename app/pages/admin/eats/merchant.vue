@@ -45,8 +45,8 @@
         <el-table-column label="月销量" width="80" prop="monthlySales" />
         <el-table-column label="状态" width="80">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? '营业' : row.status === 0 ? '休业' : '暂停' }}
+            <el-tag :type="row.status === 1 ? 'success' : row.status === 2 ? 'warning' : 'danger'" size="small">
+              {{ row.status === 1 ? '营业' : row.status === 2 ? '暂停' : '休业' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -95,6 +95,15 @@
                 <el-option :value="0" label="普通" />
                 <el-option :value="1" label="精选" />
                 <el-option :value="2" label="品牌" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态">
+              <el-select v-model="form.status" style="width:100%">
+                <el-option :value="1" label="营业" />
+                <el-option :value="0" label="休业" />
+                <el-option :value="2" label="暂停" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -175,7 +184,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const filters = reactive({ name: '', categoryId: undefined as number | undefined, status: undefined as number | undefined })
 
-const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/eats/merchant', {
+const { data, status, refresh } = useLazyFetch<ApiResponse<PaginatedData<MerchantItem>>>('/api/admin/merchant', {
   query: computed(() => ({ page: page.value, pageSize: pageSize.value, ...filters })),
 })
 const loading = computed(() => status.value === 'pending')
@@ -186,13 +195,13 @@ const regionTree = ref<any[]>([])
 const regionCascade = ref<number>()
 
 async function loadRegionTree() {
-  const res: any = await $fetch('/api/system/region', { params: { tree: true, status: 1 } })
+  const res: any = await $fetch('/api/admin/region', { params: { tree: true, status: 1 } })
   regionTree.value = res.data.list
 }
 
 const form = reactive({
   id: 0, name: '', code: '', description: '', categoryId: undefined as number | undefined,
-  level: 0, deliveryFee: 0, minOrderAmount: 0, estimatedDeliveryTime: 30,
+  level: 0, status: 1, deliveryFee: 0, minOrderAmount: 0, estimatedDeliveryTime: 30,
   openTime: '', closeTime: '', contactPhone: '', address: '',
   regionId: undefined as number | undefined,
 })
@@ -204,7 +213,7 @@ const rules = {
 }
 
 async function loadCategories() {
-  const res: any = await $fetch('/api/eats/merchant-category/all')
+  const res: any = await $fetch('/api/admin/merchant-category/all')
   categoryOptions.value = res.data
 }
 
@@ -214,7 +223,7 @@ function handleReset() { filters.name = ''; filters.categoryId = undefined; filt
 function handleAdd() {
   isEdit.value = false
   form.id = 0; form.name = ''; form.code = ''; form.description = ''; form.categoryId = undefined
-  form.level = 0; form.deliveryFee = 0; form.minOrderAmount = 0; form.estimatedDeliveryTime = 30
+  form.level = 0; form.status = 1; form.deliveryFee = 0; form.minOrderAmount = 0; form.estimatedDeliveryTime = 30
   form.openTime = ''; form.closeTime = ''; form.contactPhone = ''; form.address = ''
   form.regionId = undefined
   regionCascade.value = undefined
@@ -225,7 +234,7 @@ function handleEdit(row: any) {
   isEdit.value = true
   Object.assign(form, {
     id: row.id, name: row.name, code: row.code, description: row.description || '',
-    categoryId: row.categoryId, level: row.level ?? 0,
+    categoryId: row.categoryId, level: row.level ?? 0, status: row.status ?? 1,
     deliveryFee: row.deliveryFee ?? 0, minOrderAmount: row.minOrderAmount ?? 0,
     estimatedDeliveryTime: row.estimatedDeliveryTime ?? 30,
     openTime: row.openTime || '', closeTime: row.closeTime || '',
@@ -243,10 +252,10 @@ async function handleSubmit() {
   try {
     const body = { ...form, id: undefined }
     if (isEdit.value) {
-      await $fetch(`/api/eats/merchant/${form.id}`, { method: 'PUT', body })
+      await $fetch(`/api/admin/merchant/${form.id}`, { method: 'PUT', body })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/eats/merchant', { method: 'POST', body })
+      await $fetch('/api/admin/merchant', { method: 'POST', body })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -260,7 +269,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确定删除商家"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/eats/merchant/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/merchant/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   refresh()
 }

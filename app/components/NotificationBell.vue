@@ -100,14 +100,14 @@ function handleOpen() {
 
 async function handleRead(item: NotificationItem) {
   if (item.isRead === 0) {
-    await $fetch(`/api/system/notification/${item.id}/read`, { method: 'PUT' })
+    await $fetch(`/api/admin/notification/${item.id}/read`, { method: 'PUT' })
     item.isRead = 1
     refreshUnreadCount()
   }
 }
 
 async function handleReadAll() {
-  await $fetch('/api/system/notification/read-all', { method: 'PUT' })
+  await $fetch('/api/admin/notification/read-all', { method: 'PUT' })
   list.value.forEach(i => { i.isRead = 1 })
   refreshUnreadCount()
 }

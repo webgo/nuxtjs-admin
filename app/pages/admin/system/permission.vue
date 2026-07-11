@@ -135,7 +135,7 @@ const rules = {
 async function fetchData() {
   loading.value = true
   try {
-    const res = await $fetch('/api/system/permission') as unknown as ApiResponse<PermissionNode[]>
+    const res = await $fetch('/api/admin/permission') as unknown as ApiResponse<PermissionNode[]>
     permList.value = res.data
   } finally {
     loading.value = false
@@ -182,10 +182,10 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (isEdit.value) {
-      await $fetch(`/api/system/permission/${form.id}`, { method: 'PUT', body: { ...form } })
+      await $fetch(`/api/admin/permission/${form.id}`, { method: 'PUT', body: { ...form } })
       ElMessage.success('更新成功')
     } else {
-      await $fetch('/api/system/permission', { method: 'POST', body: { ...form } })
+      await $fetch('/api/admin/permission', { method: 'POST', body: { ...form } })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
@@ -199,7 +199,7 @@ async function handleSubmit() {
 
 async function handleDelete(row: PermissionNode) {
   await ElMessageBox.confirm(`确定删除菜单"${row.name}"？`, '提示', { type: 'warning' })
-  await $fetch(`/api/system/permission/${row.id}`, { method: 'DELETE' })
+  await $fetch(`/api/admin/permission/${row.id}`, { method: 'DELETE' })
   ElMessage.success('删除成功')
   fetchData()
 }

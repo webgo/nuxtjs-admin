@@ -2,10 +2,12 @@ import { verifyToken, getTokenFromHeader } from '../utils/jwt'
 
 // 不需要认证的路由白名单
 const publicPaths = [
-  '/api/auth/login',
-  '/api/eats/merchant',
-  '/api/eats/product',
-  '/api/eats/merchant-category',
+  '/api/admin/auth/login',
+  '/api/portal/auth/login',
+  '/api/portal/auth/register',
+  '/api/portal/merchant/',
+  '/api/portal/product/',
+  '/api/portal/merchant-category/',
 ]
 
 export default defineEventHandler(async (event) => {
@@ -32,7 +34,11 @@ export default defineEventHandler(async (event) => {
   // 存储不可用时降级为仅依赖 JWT 校验
   try {
     const { hasItem } = await import('../utils/storage')
-    const exists = await hasItem(`online_token:${token}`)
+    const path = getRequestURL(event).pathname || ''
+    const storageKey = path.startsWith('/api/portal/')
+      ? `portal_online_token:${token}`
+      : `admin_online_token:${token}`
+    const exists = await hasItem(storageKey)
     if (!exists) {
       throw createError({ statusCode: 401, message: '登录已过期，请重新登录' })
     }
