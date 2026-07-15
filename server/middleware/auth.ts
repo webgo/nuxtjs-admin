@@ -8,6 +8,7 @@ const publicPaths = [
   '/api/portal/merchant/',
   '/api/portal/product/',
   '/api/portal/merchant-category/',
+  '/api/portal/region/',
 ]
 
 export default defineEventHandler(async (event) => {

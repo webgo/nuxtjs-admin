@@ -261,18 +261,18 @@ async function loadRegions() {
   const currentLang = localeMap[locale.value] || 'tw'
 
   const [countriesRes, allCountriesRes] = await Promise.all([
-    $fetch<ApiResponse<RegionItem[]>>('/api/admin/region/options', { params: { level: 1, lang: currentLang, status: 1 } }),
-    $fetch<ApiResponse<RegionItem[]>>('/api/admin/region/options', { params: { level: 1, status: 1 } }),
+    $fetch<ApiResponse<RegionItem[]>>('/api/portal/region/options', { params: { level: 1, lang: currentLang, status: 1 } }),
+    $fetch<ApiResponse<RegionItem[]>>('/api/portal/region/options', { params: { level: 1, status: 1 } }),
   ])
   countriesList.value = allCountriesRes.data
 
   if (countriesRes.data?.length) {
     currentCountry.value = countriesRes.data[0]
-    const citiesRes = await $fetch<ApiResponse<RegionItem[]>>('/api/admin/region/options', { params: { parentId: currentCountry.value?.id, status: 1 } })
+    const citiesRes = await $fetch<ApiResponse<RegionItem[]>>('/api/portal/region/options', { params: { parentId: currentCountry.value?.id, status: 1 } })
     if (citiesRes.data?.[0]?.level === 2) {
       const allCities: any[] = []
       for (const province of citiesRes.data) {
-        const res = await $fetch<ApiResponse<RegionItem[]>>('/api/admin/region/options', { params: { parentId: province.id, status: 1 } })
+        const res = await $fetch<ApiResponse<RegionItem[]>>('/api/portal/region/options', { params: { parentId: province.id, status: 1 } })
         allCities.push(...res.data.map((c) => ({ ...c, parentName: getRegionName(province) })))
       }
       citiesList.value = allCities

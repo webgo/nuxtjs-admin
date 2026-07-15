@@ -14,9 +14,18 @@
     "loginHint": "登入以查看最近地址"
   },
   "features": {
-    "card1": { "title": "以美食獎勵員工辛勞", "subtitle": "建立企業帳戶" },
-    "card2": { "title": "協助餐廳夥伴外送美食", "subtitle": "與我們合作" },
-    "card3": { "title": "透過 Vber Eats 平台接外送", "subtitle": "以合作外送夥伴身分加入" }
+    "card1": {
+      "title": "以美食獎勵員工辛勞",
+      "subtitle": "建立企業帳戶"
+    },
+    "card2": {
+      "title": "協助餐廳夥伴外送美食",
+      "subtitle": "與我們合作"
+    },
+    "card3": {
+      "title": "透過 Vber Eats 平台接外送",
+      "subtitle": "以合作外送夥伴身分加入"
+    }
   },
   "cities": {
     "title": "附近的城市",
@@ -51,10 +60,30 @@
   "footer": {
     "appStore": "App Store",
     "googlePlay": "Google Play",
-    "col1": { "title": "關於我們", "link1": "新聞稿", "link2": "我們的部落格", "link3": "以合作外送夥伴身分加入" },
-    "col2": { "title": "探索", "link1": "查看所有城市", "link2": "查看所有國家/地區", "link3": "查看所有餐廳" },
-    "col3": { "title": "隱私權與條款", "link1": "隱私權政策", "link2": "使用條款", "link3": "Cookie 政策" },
-    "col4": { "title": "協助與支援", "link1": "常見問題", "link2": "聯絡我們", "link3": "中文" },
+    "col1": {
+      "title": "關於我們",
+      "link1": "新聞稿",
+      "link2": "我們的部落格",
+      "link3": "以合作外送夥伴身分加入"
+    },
+    "col2": {
+      "title": "探索",
+      "link1": "查看所有城市",
+      "link2": "查看所有國家/地區",
+      "link3": "查看所有餐廳"
+    },
+    "col3": {
+      "title": "隱私權與條款",
+      "link1": "隱私權政策",
+      "link2": "使用條款",
+      "link3": "Cookie 政策"
+    },
+    "col4": {
+      "title": "協助與支援",
+      "link1": "常見問題",
+      "link2": "聯絡我們",
+      "link3": "中文"
+    },
     "legal": "隱私權 · 使用條款 · 網站使用規範 · 關於此頁面的資訊 · © {year} Vber Technologies Inc."
   },
   "languageSwitcher": {
