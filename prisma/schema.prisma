@@ -24,6 +24,7 @@ model SysUser {
   roles   SysUserRole[]
   menus   SysUserMenu[]
   addresses SysUserAddress[]
+  ratings SysRating[]
 
   @@map("sys_user")
 }
@@ -446,6 +447,7 @@ model SysRating {
   images     String?  @db.Text  // JSON 图片 URL 数组
   createTime DateTime @default(now()) @map("create_time")
 
+  user     SysUser?    @relation(fields: [userId], references: [id])
   merchant SysMerchant @relation(fields: [merchantId], references: [id])
   product  SysProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
@@ -488,4 +490,38 @@ model SysUserAddress {
 
   @@index([userId])
   @@map("sys_user_address")
+}
+
+// ========== 语言管理 ==========
+model SysLanguage {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  code       String   @unique @db.VarChar(20)
+  isDefault  Boolean  @default(false) @map("is_default")
+  sort       Int      @default(0)
+  status     Int      @default(1)
+  remark     String?  @db.VarChar(500)
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+
+  translations SysTranslation[]
+
+  @@map("sys_language")
+}
+
+model SysTranslation {
+  id         Int      @id @default(autoincrement())
+  namespace  String   @db.VarChar(50)
+  key        String   @db.VarChar(100)
+  locale     String   @db.VarChar(10)
+  value      String   @db.VarChar(2000)
+  createTime DateTime @default(now()) @map("create_time")
+  updateTime DateTime @updatedAt @map("update_time")
+
+  language SysLanguage? @relation(fields: [locale], references: [code])
+
+  @@unique([namespace, key, locale])
+  @@index([locale])
+  @@index([namespace])
+  @@map("sys_translation")
 }

@@ -1,6 +1,31 @@
 import prisma from '../utils/prisma'
 
 export const ratingService = {
+  async list(params: { page: number; pageSize: number; merchantId?: number; rating?: number }) {
+    const { page, pageSize, merchantId, rating } = params
+    const where: Record<string, unknown> = Object.create(null)
+    if (merchantId) where.merchantId = merchantId
+    if (rating) where.rating = rating
+
+    const [rows, total] = await Promise.all([
+      prisma.sysRating.findMany({
+        where, skip: (page - 1) * pageSize, take: pageSize,
+        orderBy: [{ createTime: 'desc' }],
+        include: {
+          user: { select: { username: true } },
+          product: { select: { name: true } },
+        },
+      }),
+      prisma.sysRating.count({ where }),
+    ])
+    const list = rows.map(r => ({
+      id: r.id, orderId: r.orderId, userId: r.userId, username: r.user?.username,
+      merchantId: r.merchantId, productId: r.productId, productName: r.product?.name,
+      rating: r.rating, content: r.content, images: r.images, createTime: r.createTime,
+    }))
+    return { list, total, page, pageSize }
+  },
+
   async create(params: { userId: number; orderId: number; productId?: number; rating: number; content?: string; images?: string }) {
     const { userId, orderId, productId, rating, content, images } = params
 
