@@ -148,6 +148,22 @@ async function main() {
     // 评价按钮
     { id: 260, name: '评价查询', code: 'eats:rating:list', type: 2, parentId: 206, sort: 1 },
     { id: 261, name: '评价删除', code: 'eats:rating:delete', type: 2, parentId: 206, sort: 2 },
+
+    // 语言管理
+    { id: 170, name: '语言管理', code: 'system:language', type: 1, parentId: 1, path: '/admin/system/language', icon: 'ChatDotRound', sort: 11, status: 1, visible: 1 },
+    { id: 171, name: '语言查询', code: 'system:language:list', type: 2, parentId: 170, sort: 1 },
+    { id: 172, name: '语言新增', code: 'system:language:create', type: 2, parentId: 170, sort: 2 },
+    { id: 173, name: '语言修改', code: 'system:language:update', type: 2, parentId: 170, sort: 3 },
+    { id: 174, name: '语言删除', code: 'system:language:delete', type: 2, parentId: 170, sort: 4 },
+
+    // 翻译管理
+    { id: 180, name: '翻译管理', code: 'system:translation', type: 1, parentId: 1, path: '/admin/system/translation', icon: 'Translation', sort: 12, status: 1, visible: 1 },
+    { id: 181, name: '翻译查询', code: 'system:translation:list', type: 2, parentId: 180, sort: 1 },
+    { id: 182, name: '翻译新增', code: 'system:translation:create', type: 2, parentId: 180, sort: 2 },
+    { id: 183, name: '翻译修改', code: 'system:translation:update', type: 2, parentId: 180, sort: 3 },
+    { id: 184, name: '翻译删除', code: 'system:translation:delete', type: 2, parentId: 180, sort: 4 },
+    { id: 185, name: '翻译导出', code: 'system:translation:export', type: 2, parentId: 180, sort: 5 },
+    { id: 186, name: '翻译导入', code: 'system:translation:import', type: 2, parentId: 180, sort: 6 },
   ]
 
   for (const p of permissions) {
@@ -254,7 +270,21 @@ async function main() {
     })
   }
 
-  // 8. 创建商家标签字典（merchant_tag）
+  // 8. 创建语言数据
+  const languages = [
+    { name: '繁體中文', code: 'tw', isDefault: true, sort: 1, status: 1 },
+    { name: 'English', code: 'en', isDefault: false, sort: 2, status: 1 },
+    { name: '日本語', code: 'jp', isDefault: false, sort: 3, status: 1 },
+  ]
+  for (const lang of languages) {
+    await prisma.sysLanguage.upsert({
+      where: { code: lang.code },
+      update: { name: lang.name, isDefault: lang.isDefault, sort: lang.sort, status: lang.status },
+      create: lang,
+    })
+  }
+
+  // 9. 创建商家标签字典（merchant_tag）
   await prisma.sysDictType.upsert({
     where: { code: 'merchant_tag' },
     update: { name: '商家标签', status: 1 },

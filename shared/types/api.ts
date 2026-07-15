@@ -619,3 +619,40 @@ export interface UserAddressCreateBody {
   detail: string
   isDefault?: number
 }
+
+// ========== 语言模块 ==========
+export interface LanguageItem {
+  id: number
+  name: string
+  code: string
+  isDefault: boolean
+  sort: number
+  status: number
+  remark?: string
+  createTime: string
+}
+
+export interface TranslationItem {
+  id: number
+  namespace: string
+  key: string
+  locale: string
+  value: string
+  createTime: string
+}
+
+export interface TranslationGroup {
+  namespace: string
+  keys: {
+    key: string
+    values: Record<string, string>
+  }[]
+}
+
+export interface TranslationFlatItem {
+  id: string
+  namespace: string
+  key: string
+  fullKey: string
+  values: Record<string, string>
+}
