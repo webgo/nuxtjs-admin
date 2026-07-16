@@ -1,15 +1,17 @@
-import prisma from '../utils/prisma'
+import db from '../utils/db'
+import { sysTranslation, sysLanguage } from '../../db/schema'
+import { eq, asc, and } from 'drizzle-orm'
 
 export const translationService = {
   async listFlat(params: { page: number; pageSize: number; keyword?: string; keySearch?: string; namespace?: string }) {
     const { page, pageSize, keyword, keySearch, namespace } = params
-    const where: Record<string, unknown> = {}
-    if (namespace) where.namespace = namespace
+    const conditions: ReturnType<typeof eq>[] = []
+    if (namespace) conditions.push(eq(sysTranslation.namespace, namespace))
+    const where = conditions.length > 0 ? and(...conditions) : undefined
 
-    const rows = await prisma.sysTranslation.findMany({
-      where,
-      orderBy: [{ namespace: 'asc' }, { key: 'asc' }, { locale: 'asc' }],
-    })
+    const rows = await db.select().from(sysTranslation)
+      .where(where)
+      .orderBy(asc(sysTranslation.namespace), asc(sysTranslation.key), asc(sysTranslation.locale))
 
     const grouped = new Map<string, { namespace: string; key: string; values: Record<string, string> }>()
     for (const row of rows) {
@@ -49,13 +51,13 @@ export const translationService = {
   },
 
   async listByLocale(locale?: string) {
-    const where: Record<string, unknown> = {}
-    if (locale) where.locale = locale
+    const conditions: ReturnType<typeof eq>[] = []
+    if (locale) conditions.push(eq(sysTranslation.locale, locale))
+    const where = conditions.length > 0 ? and(...conditions) : undefined
 
-    const rows = await prisma.sysTranslation.findMany({
-      where,
-      orderBy: [{ namespace: 'asc' }, { key: 'asc' }, { locale: 'asc' }],
-    })
+    const rows = await db.select().from(sysTranslation)
+      .where(where)
+      .orderBy(asc(sysTranslation.namespace), asc(sysTranslation.key), asc(sysTranslation.locale))
 
     const grouped: Record<string, Record<string, Record<string, string>>> = {}
     for (const row of rows) {
@@ -68,60 +70,45 @@ export const translationService = {
   },
 
   async getNamespaces() {
-    const result = await prisma.sysTranslation.findMany({
-      select: { namespace: true },
-      distinct: ['namespace'],
-      orderBy: [{ namespace: 'asc' }],
-    })
-    return result.map(r => r.namespace)
+    const rows = await db.select({ namespace: sysTranslation.namespace })
+      .from(sysTranslation)
+      .groupBy(sysTranslation.namespace)
+      .orderBy(asc(sysTranslation.namespace))
+    return rows.map(r => r.namespace)
   },
 
   async upsert(params: { namespace: string; key: string; locale: string; value: string }) {
-    return prisma.sysTranslation.upsert({
-      where: {
-        namespace_key_locale: {
-          namespace: params.namespace,
-          key: params.key,
-          locale: params.locale,
-        },
-      },
-      update: { value: params.value },
-      create: params,
-    })
+    const now = new Date().toISOString().slice(0, 23).replace('T', ' ')
+    await db.insert(sysTranslation)
+      .values({ ...params, updateTime: now })
+      .onDuplicateKeyUpdate({ set: { value: params.value } })
+    return params
   },
 
   async batchUpsert(translations: { namespace: string; key: string; locale: string; value: string }[]) {
-    const results = []
+    if (translations.length === 0) return []
+    const now = new Date().toISOString().slice(0, 23).replace('T', ' ')
     for (const t of translations) {
-      const result = await prisma.sysTranslation.upsert({
-        where: {
-          namespace_key_locale: {
-            namespace: t.namespace,
-            key: t.key,
-            locale: t.locale,
-          },
-        },
-        update: { value: t.value },
-        create: t,
-      })
-      results.push(result)
+      await db.insert(sysTranslation)
+        .values({ ...t, updateTime: now })
+        .onDuplicateKeyUpdate({ set: { value: t.value } })
     }
-    return results
+    return translations
   },
 
   async deleteKey(namespace: string, key: string) {
-    await prisma.sysTranslation.deleteMany({ where: { namespace, key } })
+    await db.delete(sysTranslation).where(and(eq(sysTranslation.namespace, namespace), eq(sysTranslation.key, key)))
     return true
   },
 
   async deleteEntry(id: number) {
-    await prisma.sysTranslation.delete({ where: { id } })
+    await db.delete(sysTranslation).where(eq(sysTranslation.id, id))
     return true
   },
 
   async exportToJson() {
-    const languages = await prisma.sysLanguage.findMany({ where: { status: 1 } })
-    const allTranslations = await prisma.sysTranslation.findMany()
+    const languages = await db.select().from(sysLanguage).where(eq(sysLanguage.status, 1))
+    const allTranslations = await db.select().from(sysTranslation)
 
     const results: { code: string; file: string; keys: number }[] = []
 
@@ -159,7 +146,7 @@ export const translationService = {
     const fs = await import('fs')
     const path = await import('path')
 
-    const languages = await prisma.sysLanguage.findMany()
+    const languages = await db.select().from(sysLanguage)
     const results: { code: string; keys: number }[] = []
 
     for (const lang of languages) {

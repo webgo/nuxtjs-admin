@@ -1,5 +1,4 @@
-import bcrypt from 'bcryptjs'
-import prisma from '../../../utils/prisma'
+import { authService } from '../../../services/auth.service'
 
 export default defineEventHandler(async (event) => {
   const auth = event.context.auth
@@ -14,14 +13,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: '新密码至少6位' })
   }
 
-  const user = await prisma.sysUser.findUnique({ where: { id: auth.userId } })
-  if (!user) throw createError({ statusCode: 404, message: '用户不存在' })
-
-  const valid = await bcrypt.compare(oldPassword, user.password)
-  if (!valid) throw createError({ statusCode: 400, message: '旧密码错误' })
-
-  const hashed = await bcrypt.hash(newPassword, 10)
-  await prisma.sysUser.update({ where: { id: auth.userId }, data: { password: hashed } })
+  await authService.changePassword(auth.userId, oldPassword, newPassword)
 
   return { code: 200, msg: '密码修改成功' }
 })

@@ -1,4 +1,5 @@
-import prisma from './prisma'
+import db from './db'
+import { sysAuditLog } from '../../db/schema'
 
 export interface AuditParams {
   userId: number
@@ -12,7 +13,7 @@ export interface AuditParams {
 
 export async function writeAuditLog(params: AuditParams) {
   try {
-    await prisma.sysAuditLog.create({ data: params })
+    await db.insert(sysAuditLog).values(params)
   } catch (err) {
     console.error('[AuditLog] write failed:', err)
   }

@@ -1,4 +1,6 @@
-import prisma from '../../../utils/prisma'
+import db from '../../../utils/db'
+import { sysUser } from '../../../../db/schema'
+import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const auth = event.context.auth
@@ -17,11 +19,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: '请提供要更新的字段' })
   }
 
-  const user = await prisma.sysUser.update({
-    where: { id: auth.userId },
-    data,
-    select: { id: true, username: true, nickname: true, email: true, phone: true, avatar: true, status: true },
-  })
+  await db.update(sysUser).set(data).where(eq(sysUser.id, auth.userId))
+
+  const [user] = await db.select({
+    id: sysUser.id, username: sysUser.username, nickname: sysUser.nickname,
+    email: sysUser.email, phone: sysUser.phone, avatar: sysUser.avatar, status: sysUser.status,
+  }).from(sysUser).where(eq(sysUser.id, auth.userId))
 
   return { code: 200, msg: '更新成功', data: user }
 })

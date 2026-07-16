@@ -37,16 +37,16 @@
         >
           <template #default="{ row }">
             <el-input
-              :model-value="getEditingValue(row, lang.code)"
+              :model-value="getEditingValue(row as TranslationFlatItem, lang.code)"
               size="small"
-              @input="(val: string) => setEditingValue(row, lang.code, val)"
-              @blur="handleSaveTranslation(row, lang.code, getEditingValue(row, lang.code))"
+              @input="(val: string) => setEditingValue(row as TranslationFlatItem, lang.code, val)"
+              @blur="handleSaveTranslation(row as TranslationFlatItem, lang.code, getEditingValue(row as TranslationFlatItem, lang.code))"
             />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
-            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(row as TranslationFlatItem)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -126,7 +126,7 @@ function getEditingValue(row: TranslationFlatItem, locale: string): string {
   if (!(cellKey in editingValues)) {
     editingValues[cellKey] = row.values[locale] || ''
   }
-  return editingValues[cellKey]
+  return editingValues[cellKey] ?? ''
 }
 
 function setEditingValue(row: TranslationFlatItem, locale: string, val: string) {

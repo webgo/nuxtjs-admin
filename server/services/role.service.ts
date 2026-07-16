@@ -1,97 +1,111 @@
-import prisma from '../utils/prisma'
+import db from '../utils/db'
+import { sysRole, sysUserRole, sysRolePermission, sysPermission } from '../../db/schema'
+import { eq, like, asc, and, count as drizzleCount } from 'drizzle-orm'
 
 export const roleService = {
   async list(params: { page: number; pageSize: number; name?: string; code?: string; status?: number }) {
     const { page, pageSize, name, code, status } = params
-    const where: Record<string, unknown> = {}
-    if (name) where.name = { contains: name }
-    if (code) where.code = { contains: code }
-    if (status !== undefined) where.status = status
+    const conditions: ReturnType<typeof eq>[] = []
+    if (name) conditions.push(like(sysRole.name, `%${name}%`))
+    if (code) conditions.push(like(sysRole.code, `%${code}%`))
+    if (status !== undefined) conditions.push(eq(sysRole.status, status))
+    const where = conditions.length > 0 ? and(...conditions) : undefined
 
-    const [rows, total] = await Promise.all([
-      prisma.sysRole.findMany({
-        where, skip: (page - 1) * pageSize, take: pageSize,
-        orderBy: [{ sort: 'asc' }],
-        include: { _count: { select: { users: true } } },
-      }),
-      prisma.sysRole.count({ where }),
+    const [rows, countResult] = await Promise.all([
+      db.select({
+        id: sysRole.id, name: sysRole.name, code: sysRole.code,
+        description: sysRole.description, status: sysRole.status,
+        sort: sysRole.sort, remark: sysRole.remark,
+        createTime: sysRole.createTime, updateTime: sysRole.updateTime,
+        userCount: drizzleCount(sysUserRole.userId),
+      }).from(sysRole)
+        .leftJoin(sysUserRole, eq(sysRole.id, sysUserRole.roleId))
+        .where(where)
+        .orderBy(asc(sysRole.sort))
+        .groupBy(sysRole.id)
+        .offset((page - 1) * pageSize)
+        .limit(pageSize),
+      db.select({ count: drizzleCount() }).from(sysRole).where(where),
     ])
-
-    const list = rows.map(r => ({
-      id: r.id, name: r.name, code: r.code, description: r.description,
-      status: r.status, sort: r.sort, remark: r.remark,
-      createTime: r.createTime, updateTime: r.updateTime,
-      userCount: r._count.users,
-    }))
-    return { list, total, page, pageSize }
+    return { list: rows, total: countResult[0]?.count ?? 0, page, pageSize }
   },
 
   async findAll() {
-    return prisma.sysRole.findMany({
-      where: { status: 1 }, orderBy: [{ sort: 'asc' }],
-      select: { id: true, name: true, code: true },
-    })
+    return db.select({ id: sysRole.id, name: sysRole.name, code: sysRole.code })
+      .from(sysRole)
+      .where(eq(sysRole.status, 1))
+      .orderBy(asc(sysRole.sort))
   },
 
   async findById(id: number) {
-    const role = await prisma.sysRole.findUnique({
-      where: { id },
-      include: { permissions: { include: { permission: true } } },
-    })
+    const [role] = await db.select().from(sysRole).where(eq(sysRole.id, id))
     if (!role) throw createError({ statusCode: 404, message: '角色不存在' })
+
+    const rolePermissions = await db.select({ permissionId: sysRolePermission.permissionId })
+      .from(sysRolePermission)
+      .where(eq(sysRolePermission.roleId, id))
+
     return {
-      id: role.id, name: role.name, code: role.code, description: role.description,
-      status: role.status, sort: role.sort, remark: role.remark,
-      createTime: role.createTime, updateTime: role.updateTime,
-      permissionIds: role.permissions.map(rp => rp.permissionId),
+      ...role,
+      permissionIds: rolePermissions.map(rp => rp.permissionId),
     }
   },
 
   async create(params: { name: string; code: string; description?: string; status?: number; sort?: number; remark?: string; permissionIds?: number[] }) {
     const { name, code, description, status, sort, remark, permissionIds } = params
-    const existing = await prisma.sysRole.findUnique({ where: { code } })
+    const [existing] = await db.select().from(sysRole).where(eq(sysRole.code, code))
     if (existing) throw createError({ statusCode: 409, message: '角色编码已存在' })
 
-    const role = await prisma.sysRole.create({
-      data: {
-        name, code, description: description || null, status: status ?? 1, sort: sort ?? 0, remark: remark || null,
-        permissions: permissionIds?.length ? { create: permissionIds.map(permissionId => ({ permissionId })) } : undefined,
-      },
+    const now = new Date().toISOString().slice(0, 23).replace('T', ' ')
+    const [result] = await db.insert(sysRole).values({
+      name, code, description: description || null, status: status ?? 1,
+      sort: sort ?? 0, remark: remark || null, updateTime: now,
     })
-    return { id: role.id, name: role.name, code: role.code }
+    const roleId = Number(result.insertId)
+
+    if (permissionIds?.length) {
+      await db.insert(sysRolePermission).values(permissionIds.map(permissionId => ({ roleId, permissionId })))
+    }
+
+    return { id: roleId, name, code }
   },
 
   async update(id: number, params: { name?: string; code?: string; description?: string; status?: number; sort?: number; remark?: string; permissionIds?: number[] }) {
     const { name, code, description, status, sort, remark, permissionIds } = params
-    const role = await prisma.sysRole.findUnique({ where: { id } })
-    if (!role) throw createError({ statusCode: 404, message: '角色不存在' })
+    const role = await this.findById(id)
 
     if (code && code !== role.code) {
-      const existing = await prisma.sysRole.findUnique({ where: { code } })
+      const [existing] = await db.select().from(sysRole).where(eq(sysRole.code, code))
       if (existing) throw createError({ statusCode: 409, message: '角色编码已存在' })
     }
 
-    await prisma.sysRole.update({
-      where: { id },
-      data: { name: name ?? undefined, code: code ?? undefined, description: description ?? undefined, status: status ?? undefined, sort: sort ?? undefined, remark: remark ?? undefined },
-    })
+    const updateData: Record<string, unknown> = {}
+    if (name !== undefined) updateData.name = name
+    if (code !== undefined) updateData.code = code
+    if (description !== undefined) updateData.description = description
+    if (status !== undefined) updateData.status = status
+    if (sort !== undefined) updateData.sort = sort
+    if (remark !== undefined) updateData.remark = remark
+    if (Object.keys(updateData).length > 0) {
+      await db.update(sysRole).set(updateData).where(eq(sysRole.id, id))
+    }
 
     if (permissionIds !== undefined) {
-      await prisma.sysRolePermission.deleteMany({ where: { roleId: id } })
+      await db.delete(sysRolePermission).where(eq(sysRolePermission.roleId, id))
       if (permissionIds.length > 0) {
-        await prisma.sysRolePermission.createMany({ data: permissionIds.map(permissionId => ({ roleId: id, permissionId })) })
+        await db.insert(sysRolePermission).values(permissionIds.map(permissionId => ({ roleId: id, permissionId })))
       }
     }
     return this.findById(id)
   },
 
   async delete(id: number) {
-    const role = await prisma.sysRole.findUnique({ where: { id } })
-    if (!role) throw createError({ statusCode: 404, message: '角色不存在' })
-    const userCount = await prisma.sysUserRole.count({ where: { roleId: id } })
+    const role = await this.findById(id)
+    const [userCountResult] = await db.select({ count: drizzleCount() }).from(sysUserRole).where(eq(sysUserRole.roleId, id))
+    const userCount = userCountResult?.count ?? 0
     if (userCount > 0) throw createError({ statusCode: 400, message: '该角色下有用户，不能删除' })
-    await prisma.sysRolePermission.deleteMany({ where: { roleId: id } })
-    await prisma.sysRole.delete({ where: { id } })
+    await db.delete(sysRolePermission).where(eq(sysRolePermission.roleId, id))
+    await db.delete(sysRole).where(eq(sysRole.id, id))
     return true
   },
 }

@@ -1,4 +1,6 @@
-import prisma from '../utils/prisma'
+import db from '../utils/db'
+import { sysFile } from '../../db/schema'
+import { eq, like, desc, and, count } from 'drizzle-orm'
 import { generateStorageName, saveFile } from '../utils/fileStorage'
 
 export const fileService = {
@@ -8,6 +10,7 @@ export const fileService = {
     }
 
     const results = []
+    const now = new Date().toISOString().slice(0, 23).replace('T', ' ')
     for (const file of files) {
       const { filename, data, type } = file
       const fileName = filename
@@ -17,13 +20,13 @@ export const fileService = {
       const storageName = generateStorageName(fileName)
       const url = await saveFile(data, storageName)
 
-      const record = await prisma.sysFile.create({
-        data: { fileName, storageName, filePath: url, fileSize, fileType, extension, uploadBy: uploadBy || null, status: 1 },
+      const [result] = await db.insert(sysFile).values({
+        fileName, storageName, filePath: url, fileSize, fileType, extension,
+        uploadBy: uploadBy || null, status: 1, updateTime: now,
       })
       results.push({
-        id: record.id, fileName: record.fileName, filePath: record.filePath,
-        fileSize: record.fileSize, fileType: record.fileType,
-        extension: record.extension, createTime: record.createTime,
+        id: Number(result.insertId), fileName, filePath: url,
+        fileSize, fileType, extension, createTime: now,
       })
     }
     return results.length === 1 ? results[0] : results
@@ -31,30 +34,31 @@ export const fileService = {
 
   async list(params: { page: number; pageSize: number; fileName?: string; fileType?: string }) {
     const { page, pageSize, fileName, fileType } = params
-    const where: Record<string, unknown> = {}
-    if (fileName) where.fileName = { contains: fileName }
-    if (fileType) where.fileType = { contains: fileType }
+    const conditions: ReturnType<typeof eq>[] = []
+    if (fileName) conditions.push(like(sysFile.fileName, `%${fileName}%`))
+    if (fileType) conditions.push(like(sysFile.fileType, `%${fileType}%`))
+    const where = conditions.length > 0 ? and(...conditions) : undefined
 
-    const [rows, total] = await Promise.all([
-      prisma.sysFile.findMany({
-        where, skip: (page - 1) * pageSize, take: pageSize,
-        orderBy: [{ createTime: 'desc' }],
-      }),
-      prisma.sysFile.count({ where }),
+    const [rows, countResult] = await Promise.all([
+      db.select().from(sysFile)
+        .where(where)
+        .orderBy(desc(sysFile.createTime))
+        .offset((page - 1) * pageSize)
+        .limit(pageSize),
+      db.select({ count: count() }).from(sysFile).where(where),
     ])
-    return { list: rows, total, page, pageSize }
+    return { list: rows, total: countResult[0]?.count ?? 0, page, pageSize }
   },
 
   async findById(id: number) {
-    const file = await prisma.sysFile.findUnique({ where: { id } })
+    const [file] = await db.select().from(sysFile).where(eq(sysFile.id, id))
     if (!file) throw createError({ statusCode: 404, message: '文件不存在' })
     return file
   },
 
   async delete(id: number) {
-    const file = await prisma.sysFile.findUnique({ where: { id } })
-    if (!file) throw createError({ statusCode: 404, message: '文件不存在' })
-    await prisma.sysFile.delete({ where: { id } })
+    const file = await this.findById(id)
+    await db.delete(sysFile).where(eq(sysFile.id, id))
     return true
   },
 }

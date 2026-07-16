@@ -1,7 +1,8 @@
 import os from 'node:os'
 import * as cacheUtils from '../utils/cache'
 import { getKeys, getItem, removeItem } from '../utils/storage'
-import prisma from '../utils/prisma'
+import db from '../utils/db'
+import { sql } from 'drizzle-orm'
 
 export const monitorService = {
   async cacheOverview() {
@@ -88,8 +89,9 @@ export const monitorService = {
     let dbStatus = 'connected'
     let dbVersion = ''
     try {
-      const result: any = await prisma.$queryRaw`SELECT VERSION() as version`
-      dbVersion = result[0]?.version || ''
+      const result = await db.execute(sql`SELECT VERSION() as version`)
+      const rows = (result as unknown as Array<{ version: string }>)[0]
+      dbVersion = rows?.version || ''
     } catch {
       dbStatus = 'disconnected'
     }
