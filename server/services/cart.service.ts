@@ -5,17 +5,45 @@ export const cartService = {
     const items = await prisma.sysCart.findMany({
       where: { userId },
       include: {
-        product: { select: { id: true, name: true, image: true, specs: { where: { status: 1 } } } },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            specs: {
+              where: { status: 1 },
+              select: { name: true, price: true, unit: { select: { symbol: true } } },
+            },
+          },
+        },
         merchant: { select: { id: true, name: true, deliveryFee: true } },
       },
       orderBy: [{ createTime: 'desc' }],
     })
 
-    const grouped = new Map<number, { merchantId: number; merchantName: string; deliveryFee: number | undefined; items: typeof items }>()
-    for (const item of items) {
+    const itemsWithPrice = items.map((item) => {
+      const matchedSpec = item.product?.specs.find((s) => s.name === item.specName)
+      return {
+        id: item.id,
+        userId: item.userId,
+        merchantId: item.merchantId,
+        merchantName: item.merchant?.name || '',
+        productId: item.productId,
+        productName: item.product?.name || '',
+        productImage: item.product?.image || null,
+        specName: item.specName,
+        price: matchedSpec?.price ?? 0,
+        unitSymbol: matchedSpec?.unit?.symbol || '',
+        quantity: item.quantity,
+        createTime: item.createTime.toISOString(),
+      }
+    })
+
+    const grouped = new Map<number, { merchantId: number; merchantName: string; deliveryFee: number | undefined; items: typeof itemsWithPrice }>()
+    for (const item of itemsWithPrice) {
       const mid = item.merchantId
       if (!grouped.has(mid)) {
-        grouped.set(mid, { merchantId: mid, merchantName: item.merchant?.name || '', deliveryFee: item.merchant?.deliveryFee ? Number(item.merchant.deliveryFee) : undefined, items: [] })
+        grouped.set(mid, { merchantId: mid, merchantName: item.merchantName, deliveryFee: undefined, items: [] })
       }
       grouped.get(mid)!.items.push(item)
     }
