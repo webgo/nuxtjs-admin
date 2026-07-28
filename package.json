@@ -8,7 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "seed": "npx tsx prisma/seed.ts",
+    "seed": "npx tsx db/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

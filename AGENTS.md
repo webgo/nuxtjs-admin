@@ -11,7 +11,7 @@ Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手�
 | 框架 | Nuxt 4 (Vue 3 + Vite 7.3.5 + Nitro 2.13.4) |
 | UI | Element Plus (后台) / @nuxt/ui v4 (Portal) |
 | CSS | Tailwind CSS (Portal 模块) |
-| ORM | Prisma 7.8.0 + MariaDB Adapter |
+| ORM | Drizzle ORM (drizzle-orm + mysql2) |
 | 数据库 | MySQL 8.0 |
 | 缓存 | Redis (ioredis) |
 | 认证 | JWT (jsonwebtoken + bcryptjs) |
@@ -24,11 +24,15 @@ Nuxt 4 后台管理系统（RuoYi 风格），定位为通用基础开发脚手�
 
 ```
 shared/types/api.ts       前后端共享类型定义
-prisma/                   schema.prisma (18 表) + seed.ts + migrations
+db/
+  schema.ts                Drizzle 表定义（28 表）
+  relations.ts             Drizzle 关联关系
+  seed.ts                  种子数据（Drizzle）
+  migrations/meta/         Drizzle 迁移元数据
 server/
   middleware/auth.ts       全局 JWT 认证中间件（含白名单）
   plugins/audit.ts         Nitro 插件，自动记录写操作审计日志
-  utils/                   prisma.ts, jwt.ts, redis.ts, audit.ts, fileStorage.ts,
+  utils/                   db.ts(Drizzle连接), jwt.ts, redis.ts, audit.ts, fileStorage.ts,
                            response.ts(统一响应), pagination.ts(分页), query.ts(查询构建)
   services/                21 个业务服务（按领域划分，API 层仅处理输入输出）
   api/admin/               后台管理接口（auth/user/role/permission/dict-type/dict-data/
@@ -69,14 +73,14 @@ API handler 是薄控制器，业务逻辑抽取到 services：
 ```
 API Handler (输入/输出)
     ↓ 调用
-Service (业务逻辑 + Prisma 查询)
+Service (业务逻辑 + Drizzle 查询)
     ↓ 返回
 Handler (格式化响应)
 ```
 
 - **21 个服务**: auth, user, role, permission, dict, category, content, merchant, product, cart, order, rating, address, notification, file, region, price-unit, monitor, audit-log, merchant-category, product-category
 - **工具函数**: `server/utils/response.ts` (success/error/created/noContent), `pagination.ts` (分页构建), `query.ts` (条件查询构建)
-- **Prisma 字段映射**: 当前端字段名与 Prisma 关系名不同时，在 service 中做映射（如 `productCategories` → `categories`）
+- **Drizzle 字段映射**: 当前端字段名与 Drizzle 关系名不同时，在 service 中做映射（如 `productCategories` → `categories`）
 
 ## 核心能力
 
@@ -210,12 +214,12 @@ await exportExcel({
 - **页面**: 后台 `definePageMeta({ layout: 'admin', middleware: 'auth' })`，前台 `definePageMeta({ layout: 'portal' })`
 - **图标**: `<el-icon><component :is="iconName" /></el-icon>`（后台 Element Plus）
 - **响应式**: 根容器 `width: 100%`，表格 `overflow-x: auto`
-- **Prisma**: 模型前缀 `Sys`，关联表级联删除；**注意**: `orderBy` 必须使用数组格式 `[{ field: 'dir' }]`（Prisma 7）
+- **Drizzle**: 表前缀 `sys_`，关联表级联删除；`db.insert()` 返回 `OkPacket`，`db.select()` 返回行数组
 - **TS 严格模式**: 启用 `typescript.strict`，禁止 `as any`
 - **Portal 样式**: Portal 模块所有页面统一使用 Tailwind CSS utility classes，禁止编写自定义 CSS（不使用 `<style scoped>`）
 - **Portal Toast**: Portal 使用 `@nuxt/ui` 的 `useToast()`，`app.vue` 必须用 `<UApp>` 包裹才能渲染 toast。禁止使用浏览器原生 `alert()` / `confirm()`
 - **i18n 国际化**: Portal 模块使用 `@nuxtjs/i18n`，翻译文件位于 `i18n/locales/`，目前支持 `tw` / `en` / `jp` 三种语言。URL 格式为 `/portal/tw`、`/portal/en`、`/portal/jp`。
-- **Prisma 字段映射**: 当前端期望的字段名与 Prisma 关系名不同时（如 `categories` vs `productCategories`），在 service 层做映射，不要修改 Prisma schema 的关系名
+- **Drizzle 字段映射**: 当前端期望的字段名与 Drizzle 关系名不同时（如 `categories` vs `productCategories`），在 service 层做映射，不要修改 Drizzle schema 的关系名
 - **文档同步**: 每次新增功能后更新 `.env.example`、`AGENTS.md`、`shared/types/api.ts`
 - **类型检查**: 任何修改完成后，必须运行 `npm run typecheck`（或 `npx nuxi typecheck`）确保无新增类型错误
 
@@ -226,8 +230,8 @@ npm run dev       # 开发
 npm run build     # 构建
 npm run seed      # 种子数据
 npm run test      # 测试
-npx prisma migrate dev --name xxx   # 数据库迁移
-npx prisma generate                 # 重新生成 Prisma Client（schema 变更后必须运行）
+npx drizzle-kit generate   # 生成 Drizzle 迁移（schema 变更后运行）
+npx drizzle-kit migrate    # 执行 Drizzle 迁移
 npx nuxi typecheck   # 类型检查（修改完成后必须运行）
 ```
 
